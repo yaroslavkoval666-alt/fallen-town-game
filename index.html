@@ -14,6 +14,7 @@
             --warning-color: #ffaa00;
             --purple-color: #b026ff;
             --legendary-color: #ff8800;
+            --admin-color: #ff0055;
             --text-color: #e0e6ed;
             --text-muted: #7a899e;
             --border-color: #1e2433;
@@ -48,6 +49,7 @@
         .btn-warning { color: var(--warning-color); border-color: var(--warning-color); }
         .btn-purple { color: var(--purple-color); border-color: var(--purple-color); }
         .btn-legend { color: var(--legendary-color); border-color: var(--legendary-color); }
+        .btn-admin { color: var(--admin-color); border-color: var(--admin-color); background: #220a14; }
 
         .nav-tabs {
             position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg);
@@ -62,7 +64,7 @@
         input { width: 100%; padding: 8px; margin: 8px 0; background: #08090c; border: 1px solid var(--border-color); color: #fff; border-radius: 4px; font-size: 11px; }
 
         .badge { display: inline-block; background: #08090c; padding: 2px 5px; border-radius: 3px; font-size: 9px; margin-right: 3px; border: 1px solid var(--border-color); }
-        .chat-box { background: #08090c; border: 1px solid var(--border-color); border-radius: 5px; padding: 6px; height: 90px; overflow-y: auto; font-size: 10px; margin-top: 5px; }
+        .chat-box { background: #08090c; border: 1px solid var(--border-color); border-radius: 5px; padding: 6px; height: 80px; overflow-y: auto; font-size: 10px; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -79,6 +81,27 @@
                 <label><input type="radio" name="faction" value="Guardians"> 🛡️ Вартові (+10% Живучості)</label>
             </div>
             <button class="btn" onclick="registerHero()">Увійти у світ</button>
+        </div>
+    </div>
+
+    <!-- АДМИН-ПАНЕЛЬ МОДАЛКА -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="border-color: var(--admin-color);">
+            <h3 style="color: var(--admin-color); text-align: center;">👑 АДМІН-ПАНЕЛЬ (<span id="adminRoleTxt"></span>)</h3>
+            <div id="adminControls">
+                <button class="btn btn-admin" onclick="adminAddGold()">+1000 Золота</button>
+                <button class="btn btn-admin" onclick="adminAddLvl()">+1 Рівень</button>
+                <button class="btn btn-admin" onclick="adminHeal()">Повне відновлення HP/Енергії</button>
+                <button class="btn btn-admin" onclick="adminAddResources()">+50 Металу та Чипів</button>
+            </div>
+            <div id="ownerControls" style="margin-top: 10px; display:none; border-top: 1px solid #333; padding-top: 8px;">
+                <p style="font-size: 10px; color: var(--warning-color);">Керування ролями (тільки для Основателя):</p>
+                <input type="text" id="targetPlayerInput" placeholder="Нік гравця для зміни ролі">
+                <button class="btn btn-purple" onclick="setPlayerRole('admin')">Зробити Адміном</button>
+                <button class="btn btn-purple" onclick="setPlayerRole('helper')">Зробити Хелпером</button>
+                <button class="btn btn-purple" onclick="setPlayerRole('player')">Зняти права</button>
+            </div>
+            <button class="btn" style="margin-top: 15px;" onclick="toggleAdminPanel()">Закрити панель</button>
         </div>
     </div>
 
@@ -100,7 +123,7 @@
         <div class="bar-container"><div id="expFill" class="bar-fill exp-bar"></div></div>
     </div>
 
-    <!-- ВКЛАДКА 1: БОИ И РЕЙДЫ -->
+    <!-- ВКЛАДКА 1: БОИ -->
     <div id="tab-main" class="tab-content">
         <div class="card">
             <h4 style="color: var(--accent-color);">☣️ ЗОНА ПОШУКУ (PvE)</h4>
@@ -120,7 +143,7 @@
         </div>
     </div>
 
-    <!-- ВКЛАДКА 2: ГОРОД, КЛАНО ВЕ ВІЙНИ, БАНК -->
+    <!-- ВКЛАДКА 2: ГОРОД -->
     <div id="tab-city" class="tab-content" style="display:none;">
         <div class="card">
             <h4 style="color: var(--accent-color);">🏥 ГОТЕЛЬ ТА БАНК</h4>
@@ -133,7 +156,7 @@
             <div id="clanInfo" style="font-size: 10px;">Немає клану.</div>
             <input type="text" id="clanNameInput" placeholder="Назва клану">
             <button class="btn" onclick="createClan()" id="createClanBtn">🚩 Створити (200 💰)</button>
-            <button class="btn btn-danger" onclick="captureZone()" id="capZoneBtn" style="display:none;">⚔️ Захопити Сектор (+100 💰/год в казну)</button>
+            <button class="btn btn-danger" onclick="captureZone()" id="capZoneBtn" style="display:none;">⚔️ Захопити Сектор (+100 💰)</button>
         </div>
         <div class="card">
             <h4 style="color: var(--warning-color);">🎲 КАЗИНО ТА РОБОТА</h4>
@@ -142,7 +165,7 @@
         </div>
     </div>
 
-    <!-- ВКЛАДКА 3: КРАФТ, ПИТОМЦЫ, АУКЦИОН -->
+    <!-- ВКЛАДКА 3: КРАФТ -->
     <div id="tab-craft" class="tab-content" style="display:none;">
         <div class="card">
             <h4 style="color: var(--accent-color);">🎒 РЕСУРСИ ТА ПІТОМЦІ</h4>
@@ -151,21 +174,23 @@
                 <span class="badge">🧪 Чипи: <b id="resChips">0</b></span>
             </div>
             <p style="font-size: 10px;">Питомець: <b id="pPet" style="color:var(--accent-color)">Немає</b></p>
-            <button class="btn" onclick="buyPet('dog')">🐕 Купити Кібер-Пса (+10 Урону) [100 💰]</button>
+            <button class="btn" onclick="buyPet()">🐕 Купити Кібер-Пса (+10 Урону) [100 💰]</button>
         </div>
         <div class="card">
             <h4 style="color: var(--warning-color);">🔨 МАЙСТЕРНЯ КРАФТУ</h4>
             <button class="btn" onclick="craftItem('plasma')">🗡️ Плазмовий різак [+15 Сили] (10 М, 5 Ч)</button>
             <button class="btn" onclick="craftItem('exo')">🛡️ Екзоскелет [+20 Живучості] (15 М, 10 Ч)</button>
-            <button class="btn btn-legend" onclick="craftItem('legendGun')">⚡ Гаусс-гармата [+40 Сили] (30 М, 20 Ч)</button>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 4: КВЕСТЫ И АЛХИМИЯ -->
+    <!-- ВКЛАДКА 4: РЕФЕРАЛЫ -->
     <div id="tab-quests" class="tab-content" style="display:none;">
         <div class="card">
-            <h4 style="color: var(--accent-color);">🧪 АЛХІМІЯ ТА СТИМУЛЯТОРИ</h4>
-            <button class="btn btn-purple" onclick="craftPotion()">🧪 Зварити Стимулятор Ярості (5 Чипів)</button>
+            <h4 style="color: var(--accent-color);">👥 РЕФЕРАЛЬНА СИСТЕМА</h4>
+            <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 5px;">Запрошуй друзів та отримуй бонуси!</p>
+            <input type="text" id="refLinkInput" readonly style="font-size: 9px; text-align:center;">
+            <button class="btn" onclick="copyRefLink()">📋 Скопіювати реферальне посилання</button>
+            <p style="font-size: 10px; margin-top: 5px;">Запрошено друзів: <b id="refCount">0</b> | Отримано нагород: <b id="refGold">0</b> 💰</p>
         </div>
         <div class="card">
             <h4 style="color: var(--accent-color);">📜 ЗАВДАННЯ</h4>
@@ -178,23 +203,26 @@
     <div id="tab-profile" class="tab-content" style="display:none;">
         <div class="card">
             <h3 style="color: var(--accent-color); font-size: 13px;">ПРОФІЛЬ</h3>
+            <p style="font-size: 10px;">Статус: <b id="pRoleBadge" style="color:var(--warning-color);">Гравець</b></p>
             <p style="font-size: 10px;">Фракція: <b id="pFaction"></b></p>
             <p style="font-size: 10px;">Сила: <b id="stStr">10</b></p>
             <p style="font-size: 10px;">Спритність: <b id="stAgi">10</b></p>
-            <p style="font-size: 10px;">Живучість: <b id="stVit">10</b></p>
+            <p style="font-size: 10px;">Живучості: <b id="stVit">10</b></p>
             <p style="font-size: 10px; color: var(--warning-color);">Вільні очки: <b id="stFree">0</b></p>
             <button class="btn" onclick="addStat('str')">+1 Сила</button>
             <button class="btn" onclick="addStat('agi')">+1 Спритність</button>
             <button class="btn" onclick="addStat('vit')">+1 Живучість</button>
+            
+            <button class="btn btn-admin" id="adminPanelBtn" style="display:none; margin-top: 15px;" onclick="toggleAdminPanel()">👑 Відкрити Адмін-панель</button>
         </div>
     </div>
 
-    <!-- НАВИГАЦИЯ (6 ВКЛАДОК) -->
+    <!-- НАВИГАЦИЯ -->
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="openTab('main')" id="navMain">⚔️ Бій</button>
         <button class="tab-btn" onclick="openTab('city')" id="navCity">🏰 Місто</button>
         <button class="tab-btn" onclick="openTab('craft')" id="navCraft">🔨 Крафт</button>
-        <button class="tab-btn" onclick="openTab('quests')" id="navQuests">📜 Квести</button>
+        <button class="tab-btn" onclick="openTab('quests')" id="navQuests">👥 Реферали</button>
         <button class="tab-btn" onclick="openTab('profile')" id="navProfile">👤 Герой</button>
     </div>
 
@@ -203,14 +231,16 @@
     if (tg) tg.expand();
 
     let p = {
-        name: "", faction: "Raiders", lvl: 1, exp: 0, maxExp: 100,
-        gold: 200, bank: 0, pvpRating: 1000,
+        name: "", role: "player", faction: "Raiders", lvl: 1, exp: 0, maxExp: 100,
+        gold: 250, bank: 0, pvpRating: 1000,
         hp: 100, maxHp: 100, energy: 50, maxEnergy: 50,
         str: 10, agi: 10, vit: 10, freeStats: 0,
-        metal: 10, chips: 5, pet: null, potions: 0,
+        metal: 10, chips: 5, pet: null,
         eqWeapon: null, eqArmor: null,
         clan: "", clanBank: 0, bossHp: 500,
-        battlesCount: 0, q1Done: false, lastRegen: Date.now()
+        battlesCount: 0, q1Done: false,
+        refCount: 0, refGoldEarned: 0,
+        lastRegen: Date.now()
     };
 
     const chatMessages = [
@@ -220,22 +250,44 @@
     ];
 
     function init() {
-        let saved = localStorage.getItem('fallen_town_v5');
-        if (saved) { p = JSON.parse(saved); document.getElementById('regModal').classList.remove('active'); }
-        else { document.getElementById('regModal').classList.add('active'); }
-        render(); setInterval(regenTick, 1000); updateChat();
+        let saved = localStorage.getItem('fallen_town_v7');
+        if (saved) { 
+            p = JSON.parse(saved); 
+            document.getElementById('regModal').classList.remove('active'); 
+        } else { 
+            document.getElementById('regModal').classList.add('active'); 
+        }
+
+        // Авто-присвоение роли владельца нику Exodus
+        if (p.name.toLowerCase() === "exodus") {
+            p.role = "owner";
+        }
+
+        render(); 
+        setInterval(regenTick, 1000); 
+        updateChat();
     }
 
-    function save() { localStorage.setItem('fallen_town_v5', JSON.stringify(p)); }
+    function save() { localStorage.setItem('fallen_town_v7', JSON.stringify(p)); }
 
     function registerHero() {
         let name = document.getElementById('heroNameInput').value.trim();
+        
+        // Защита никнейма Exodus
+        if (name.toLowerCase() === "exodus") {
+            alert("❌ Цей нік зарезервований Засновником гри!");
+            return;
+        }
+
         p.name = name || "Survivor";
+        p.role = "player"; // Обычный игрок при регистрации
+
         let factions = document.getElementsByName('faction');
         for (let f of factions) { if (f.checked) p.faction = f.value; }
         if (p.faction === 'Raiders') p.str += 3;
         if (p.faction === 'Hunters') p.agi += 3;
         if (p.faction === 'Guardians') p.vit += 3;
+
         document.getElementById('regModal').classList.remove('active');
         save(); render();
     }
@@ -256,11 +308,13 @@
 
     function updateChat() {
         let box = document.getElementById('chatBox');
-        box.innerHTML = chatMessages.map(m => `<div>${m}</div>`).join('');
+        if (box) box.innerHTML = chatMessages.map(m => `<div>${m}</div>`).join('');
     }
 
     function render() {
         p.maxEnergy = getMaxEnergy();
+        if (p.name.toLowerCase() === "exodus") p.role = "owner"; // Гарантия прав
+
         let bonusStr = (p.eqWeapon ? p.eqWeapon.bonus : 0) + (p.pet ? 10 : 0);
         let bonusVit = p.eqArmor ? p.eqArmor.bonus : 0;
         p.maxHp = 100 + ((p.vit + bonusVit) - 10) * 10;
@@ -271,6 +325,9 @@
         document.getElementById('pBank').innerText = p.bank;
         document.getElementById('pPvp').innerText = p.pvpRating;
         document.getElementById('pFaction').innerText = p.faction;
+
+        let roleNames = { player: "Гравець", helper: "🛡️ Хелпер", admin: "⚡ Адміністратор", owner: "👑 Основатель" };
+        document.getElementById('pRoleBadge').innerText = roleNames[p.role] || "Гравець";
 
         document.getElementById('hpTxt').innerText = `${p.hp}/${p.maxHp}`;
         document.getElementById('hpFill').style.width = `${(p.hp / p.maxHp) * 100}%`;
@@ -289,16 +346,59 @@
         document.getElementById('bossHp').innerText = p.bossHp;
         document.getElementById('pPet').innerText = p.pet || "Немає";
 
-        if (p.clan) {
-            document.getElementById('clanInfo').innerHTML = `Клан: <b>${p.clan}</b> (Казна: ${p.clanBank} 💰)`;
-            document.getElementById('clanNameInput').style.display = 'none';
-            document.getElementById('createClanBtn').style.display = 'none';
-            document.getElementById('capZoneBtn').style.display = 'block';
-        }
+        // Доступ к админ-панели (Хелпер, Админ, Основатель)
+        let hasAdminAccess = p.role !== 'player';
+        document.getElementById('adminPanelBtn').style.display = hasAdminAccess ? 'block' : 'none';
 
-        document.getElementById('q1Status').innerText = `${Math.min(3, p.battlesCount)}/3` + (p.q1Done ? " (OK)" : "");
+        // Элементы управления только для Основателя (Owner)
+        let isOwner = p.role === 'owner';
+        document.getElementById('ownerControls').style.display = isOwner ? 'block' : 'none';
+        document.getElementById('adminRoleTxt').innerText = roleNames[p.role];
+
+        let botUsername = "FallenTown_bot";
+        let refLink = `https://t.me/${botUsername}?start=ref_${p.name.replace(/\s+/g, '_')}`;
+        let rInput = document.getElementById('refLinkInput');
+        if(rInput) rInput.value = refLink;
+        document.getElementById('refCount').innerText = p.refCount;
+        document.getElementById('refGold').innerText = p.refGoldEarned;
+
+        if (p.clan) {
+            let clanEl = document.getElementById('clanInfo');
+            if (clanEl) clanEl.innerHTML = `Клан: <b>${p.clan}</b> (Казна: ${p.clanBank} 💰)`;
+            let cInput = document.getElementById('clanNameInput');
+            let cBtn = document.getElementById('createClanBtn');
+            let capBtn = document.getElementById('capZoneBtn');
+            if (cInput) cInput.style.display = 'none';
+            if (cBtn) cBtn.style.display = 'none';
+            if (capBtn) capBtn.style.display = 'block';
+        }
     }
 
+    // --- ФУНКЦИИ АДМИН-ПАНЕЛИ ---
+    function toggleAdminPanel() {
+        document.getElementById('adminModal').classList.toggle('active');
+    }
+
+    function adminAddGold() { p.gold += 1000; save(); render(); alert("👑 Адмін: +1000 золота!"); }
+    function adminAddLvl() { p.lvl++; p.freeStats += 3; p.maxHp += 10; save(); render(); alert("👑 Адмін: +1 рівень!"); }
+    function adminHeal() { p.hp = p.maxHp; p.energy = p.maxEnergy; save(); render(); alert("👑 Адмін: повне відновлення!"); }
+    function adminAddResources() { p.metal += 50; p.chips += 50; save(); render(); alert("👑 Адмін: +50 ресурсів!"); }
+
+    // Выдача прав другим игрокам (Симуляция для текущей сессии / базы)
+    function setPlayerRole(newRole) {
+        let targetName = document.getElementById('targetPlayerInput').value.trim();
+        if (!targetName) { alert("Введіть нік гравця!"); return; }
+        
+        if (p.name.toLowerCase() === targetName.toLowerCase()) {
+            p.role = newRole;
+            save(); render();
+            alert(`✅ Вашу роль змінено на: ${newRole}`);
+        } else {
+            alert(`✅ Гравцю ${targetName} успішно призначено роль: ${newRole} (умовно збережено в системі).`);
+        }
+    }
+
+    // --- ИГРОВЫЕ МЕХАНИКИ ---
     function startBattle() {
         if (p.energy < 10) { alert("Мало енергії!"); return; }
         p.energy -= 10; p.battlesCount++;
@@ -313,13 +413,8 @@
     function startPvp() {
         if (p.energy < 15) return;
         p.energy -= 15;
-        if (Math.random() > 0.4) {
-            p.pvpRating += 20; p.gold += 60;
-            alert("🥊 Перемога на PvP арені!");
-        } else {
-            p.pvpRating = Math.max(0, p.pvpRating - 10);
-            alert("❌ Поразка в PvP.");
-        }
+        if (Math.random() > 0.4) { p.pvpRating += 20; p.gold += 60; alert("🥊 Перемога на PvP арені!"); }
+        else { p.pvpRating = Math.max(0, p.pvpRating - 10); alert("❌ Поразка в PvP."); }
         save(); render();
     }
 
@@ -336,16 +431,10 @@
         save(); render();
     }
 
-    function buyPet(type) {
+    function buyPet() {
         if (p.gold < 100) { alert("Немає 100 золота!"); return; }
         p.gold -= 100; p.pet = "Кібер-Пес";
         save(); render(); alert("🐕 Кібер-Пес куплений!");
-    }
-
-    function craftPotion() {
-        if (p.chips < 5) { alert("Потрібно 5 чипів!"); return; }
-        p.chips -= 5; p.potions++;
-        alert("🧪 Стимулятор зварено!"); save(); render();
     }
 
     function captureZone() {
@@ -360,15 +449,16 @@
     function playGamble() { if (p.gold >= 25) { p.gold -= 25; if (Math.random() > 0.5) p.gold += 50; save(); render(); } }
 
     function craftItem(type) {
-        if (type === 'plasma' && p.metal >= 10 && p.chips >= 5) { p.metal -= 10; p.chips -= 5; p.eqWeapon = { bonus: 15 }; }
-        else if (type === 'exo' && p.metal >= 15 && p.chips >= 10) { p.metal -= 15; p.chips -= 10; p.eqArmor = { bonus: 20 }; }
-        else if (type === 'legendGun' && p.metal >= 30 && p.chips >= 20) { p.metal -= 30; p.chips -= 20; p.eqWeapon = { bonus: 40 }; }
+        if (type === 'plasma' && p.metal >= 10 && p.chips >= 5) { p.metal -= 10; p.chips -= 5; p.eqWeapon = { bonus: 15 }; alert("Створено Плазмовий різак!"); }
+        else if (type === 'exo' && p.metal >= 15 && p.chips >= 10) { p.metal -= 15; p.chips -= 10; p.eqArmor = { bonus: 20 }; alert("Створено Екзоскелет!"); }
+        else { alert("Недостатньо матеріалів!"); }
         save(); render();
     }
 
     function healAtInn() { if (p.gold >= 30) { p.gold -= 30; p.hp = p.maxHp; p.energy = p.maxEnergy; save(); render(); } }
     function createClan() { let name = document.getElementById('clanNameInput').value.trim(); if (name && p.gold >= 200) { p.gold -= 200; p.clan = name; save(); render(); } }
     function claimQuest(id) { if (id === 1 && !p.q1Done && p.battlesCount >= 3) { p.q1Done = true; p.gold += 50; save(); render(); } }
+    function copyRefLink() { navigator.clipboard.writeText(document.getElementById('refLinkInput').value); alert("📋 Посилання скопійовано!"); }
 
     function checkLvlUp() {
         if (p.exp >= p.maxExp) {
@@ -390,7 +480,7 @@
         });
         ['navMain', 'navCity', 'navCraft', 'navQuests', 'navProfile'].forEach((b, idx) => {
             let names = ['main', 'city', 'craft', 'quests', 'profile'];
-            document.getElementById(b).classList.toggle('active', names[idx] === tabName);
+            document.getElementById(['navMain', 'navCity', 'navCraft', 'navQuests', 'navProfile'][idx]).classList.toggle('active', names[idx] === tabName);
         });
     }
 
