@@ -3,276 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fallen Town MMORPG</title>
+    <title>Fallen Town MMORPG Ultimate</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #0d0f12;
-            --card-bg: #161920;
+            --bg-color: #08090c;
+            --card-bg: #11141c;
             --accent-color: #00ffcc;
             --danger-color: #ff3366;
             --warning-color: #ffaa00;
+            --purple-color: #b026ff;
+            --legendary-color: #ff8800;
             --text-color: #e0e6ed;
-            --text-muted: #8a99ad;
-            --border-color: #2a2f3d;
+            --text-muted: #7a899e;
+            --border-color: #1e2433;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 10px;
-            padding-bottom: 75px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding: 8px; padding-bottom: 90px; }
 
         .header {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 8px 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
         }
+        .user-info h3 { color: var(--accent-color); font-size: 13px; }
+        .stats-bar { margin-top: 2px; font-size: 10px; color: var(--text-muted); }
 
-        .user-info h3 {
-            color: var(--accent-color);
-            font-size: 16px;
-        }
-
-        .stats-bar {
-            margin-top: 5px;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .bar-container {
-            width: 100%;
-            background: #222;
-            border-radius: 5px;
-            height: 10px;
-            margin: 4px 0;
-            overflow: hidden;
-        }
-
-        .bar-fill {
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-
+        .bar-container { width: 100%; background: #181c26; border-radius: 4px; height: 7px; margin: 2px 0; overflow: hidden; }
+        .bar-fill { height: 100%; transition: width 0.3s ease; }
         .hp-bar { background: var(--danger-color); }
         .energy-bar { background: var(--warning-color); }
         .exp-bar { background: var(--accent-color); }
 
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 12px;
-        }
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+        .card h4 { font-size: 12px; margin-bottom: 4px; }
 
         .btn {
-            background: #222834;
-            color: var(--accent-color);
-            border: 1px solid var(--accent-color);
-            padding: 10px 15px;
-            border-radius: 6px;
-            width: 100%;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: 0.2s;
+            background: #181e2b; color: var(--accent-color); border: 1px solid var(--accent-color);
+            padding: 8px 10px; border-radius: 5px; width: 100%; font-weight: bold; font-size: 11px;
+            cursor: pointer; margin-top: 5px; transition: 0.2s;
         }
-
-        .btn:active {
-            transform: scale(0.98);
-            background: var(--accent-color);
-            color: #000;
-        }
-
+        .btn:active { transform: scale(0.98); background: var(--accent-color); color: #000; }
         .btn-danger { color: var(--danger-color); border-color: var(--danger-color); }
         .btn-warning { color: var(--warning-color); border-color: var(--warning-color); }
+        .btn-purple { color: var(--purple-color); border-color: var(--purple-color); }
+        .btn-legend { color: var(--legendary-color); border-color: var(--legendary-color); }
 
         .nav-tabs {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            z-index: 50;
+            position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg);
+            border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 5px 0; z-index: 50;
         }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 11px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-        }
-
+        .tab-btn { background: none; border: none; color: var(--text-muted); font-size: 8px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .tab-btn.active { color: var(--accent-color); }
 
-        .lang-switch {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 100;
-            padding: 20px;
-            align-items: center;
-            justify-content: center;
-        }
-
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 100; padding: 15px; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--accent-color); border-radius: 8px; padding: 15px; width: 100%; max-width: 380px; }
+        input { width: 100%; padding: 8px; margin: 8px 0; background: #08090c; border: 1px solid var(--border-color); color: #fff; border-radius: 4px; font-size: 11px; }
 
-        .modal-content {
-            background: var(--card-bg);
-            border: 1px solid var(--accent-color);
-            border-radius: 10px;
-            padding: 20px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background: #0d0f12;
-            border: 1px solid var(--border-color);
-            color: #fff;
-            border-radius: 5px;
-        }
+        .badge { display: inline-block; background: #08090c; padding: 2px 5px; border-radius: 3px; font-size: 9px; margin-right: 3px; border: 1px solid var(--border-color); }
+        .chat-box { background: #08090c; border: 1px solid var(--border-color); border-radius: 5px; padding: 6px; height: 90px; overflow-y: auto; font-size: 10px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <!-- МОДАЛКА РЕГИСТРАЦИИ -->
+    <!-- РЕГИСТРАЦИЯ -->
     <div id="regModal" class="modal">
         <div class="modal-content">
-            <h2 id="regTitle" style="color: var(--accent-color); text-align: center;">Fallen Town</h2>
-            <p id="regDesc" style="margin-top: 10px; font-size: 13px; color: var(--text-muted);"></p>
-            <input type="text" id="heroNameInput" placeholder="Ім'я героя / Hero name">
-            <button class="btn" id="startBtn" onclick="registerHero()"></button>
+            <h2 style="color: var(--accent-color); text-align: center; font-size: 16px;">Fallen Town MMORPG</h2>
+            <p style="margin-top: 6px; font-size: 11px; color: var(--text-muted);">Введіть ім'я та фракцію:</p>
+            <input type="text" id="heroNameInput" placeholder="Ім'я героя">
+            <div style="margin: 8px 0; font-size: 11px;">
+                <label><input type="radio" name="faction" value="Raiders" checked> ☠️ Рейдери (+10% Сили)</label><br>
+                <label><input type="radio" name="faction" value="Hunters"> 🎯 Мисливці (+10% Спритності)</label><br>
+                <label><input type="radio" name="faction" value="Guardians"> 🛡️ Вартові (+10% Живучості)</label>
+            </div>
+            <button class="btn" onclick="registerHero()">Увійти у світ</button>
         </div>
     </div>
 
-    <!-- ШАПКА ИГРОКА -->
+    <!-- ШАПКА -->
     <div class="header">
         <div class="user-info">
-            <h3 id="pName">Завантаження...</h3>
-            <div class="stats-bar">
-                <span>Рівень: <b id="pLvl">1</b></span> | 
-                <span>Золото: <b id="pGold">0</b></span>
-            </div>
+            <h3 id="pName">...</h3>
+            <div class="stats-bar">Lvl: <b id="pLvl">1</b> | 💰 <b id="pGold">0</b> | 🏦 <b id="pBank">0</b> | 🏆 <b id="pPvp">1000</b></div>
         </div>
-        <select class="lang-switch" onchange="changeLanguage(this.value)">
-            <option value="ua">UA</option>
-            <option value="en">EN</option>
-        </select>
     </div>
 
-    <!-- ШКАЛЫ (HP / ЭНЕРГИЯ / ОПЫТ) -->
+    <!-- ШКАЛЫ -->
     <div class="card">
-        <div style="font-size: 12px;">Здоров'я: <span id="hpTxt">0/0</span></div>
+        <div style="font-size: 10px;">HP: <span id="hpTxt">0/0</span></div>
         <div class="bar-container"><div id="hpFill" class="bar-fill hp-bar"></div></div>
-
-        <div style="font-size: 12px; margin-top: 5px;">Енергія (+10/хв): <span id="energyTxt">0/0</span></div>
+        <div style="font-size: 10px; margin-top: 2px;">Енергія: <span id="energyTxt">0/0</span></div>
         <div class="bar-container"><div id="energyFill" class="bar-fill energy-bar"></div></div>
-
-        <div style="font-size: 12px; margin-top: 5px;">Досвід: <span id="expTxt">0/0</span></div>
+        <div style="font-size: 10px; margin-top: 2px;">Досвід: <span id="expTxt">0/0</span></div>
         <div class="bar-container"><div id="expFill" class="bar-fill exp-bar"></div></div>
     </div>
 
-    <!-- ВКЛАДКА 1: БОЙ / РУИНЫ -->
+    <!-- ВКЛАДКА 1: БОИ И РЕЙДЫ -->
     <div id="tab-main" class="tab-content">
         <div class="card">
-            <h4 id="locTitle" style="color: var(--accent-color);">Закинуті Вкраїни</h4>
-            <p id="locDesc" style="font-size: 12px; color: var(--text-muted); margin: 8px 0;">Дикі землі навколо руїн. Тут водяться мутанти та нападники.</p>
-            <button class="btn btn-danger" onclick="startBattle()" id="fightBtn">⚔️ Шукати ворога (-10 Енергії)</button>
+            <h4 style="color: var(--accent-color);">☣️ ЗОНА ПОШУКУ (PvE)</h4>
+            <button class="btn btn-danger" onclick="startBattle()">⚔️ Шукати ворога (-10 Енергії)</button>
         </div>
-
-        <div class="card" id="battleLogCard" style="display:none;">
-            <h4 style="color: var(--warning-color);" id="logTitle">Журнал бою</h4>
-            <div id="battleLog" style="font-size: 12px; margin-top: 8px; max-height: 150px; overflow-y: auto;"></div>
+        <div class="card">
+            <h4 style="color: var(--danger-color);">⚔️ PvP АРЕНА</h4>
+            <button class="btn btn-danger" onclick="startPvp()">🥊 Напасти на гравця (-15 Енергії)</button>
+        </div>
+        <div class="card">
+            <h4 style="color: var(--purple-color);">👾 СВІТОВИЙ БОС (HP: <span id="bossHp">500</span>)</h4>
+            <button class="btn btn-purple" onclick="attackBoss()">💥 Атакувати боса (-25 Енергії)</button>
+        </div>
+        <div class="card">
+            <h4 style="color: var(--warning-color);">💬 ЧАТ ВІЙСЬКОВИХ</h4>
+            <div class="chat-box" id="chatBox"></div>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 2: ГОРОД / ХАБ -->
+    <!-- ВКЛАДКА 2: ГОРОД, КЛАНО ВЕ ВІЙНИ, БАНК -->
     <div id="tab-city" class="tab-content" style="display:none;">
         <div class="card">
-            <h4 style="color: var(--accent-color);" id="cityTitle">ЦЕНТРАЛЬНИЙ ХАБ</h4>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;" id="cityDesc">Безпечна зона Fallen Town. Тут можна відновити сили та закупитися.</p>
-            <button class="btn btn-warning" onclick="healAtInn()" id="innBtn">🏥 Відпочити в готелі (+100 HP, +50 Енергії) - 30 Золота</button>
+            <h4 style="color: var(--accent-color);">🏥 ГОТЕЛЬ ТА БАНК</h4>
+            <button class="btn btn-warning" onclick="healAtInn()">🏥 Відпочити (-30 Золота)</button>
+            <button class="btn" onclick="bankDeposit()">📥 Покласти 100 золота в банк</button>
+            <button class="btn" onclick="bankWithdraw()">📤 Зняти 100 золота з банку</button>
         </div>
-    </div>
-
-    <!-- ВКЛАДКА 3: МАГАЗИН / ИНВЕНТАРЬ -->
-    <div id="tab-shop" class="tab-content" style="display:none;">
         <div class="card">
-            <h4 style="color: var(--accent-color);" id="shopTitle">ЧОРНИЙ РИНОК</h4>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;" id="shopDesc">Купуй спорядження для підвищення характеристик.</p>
-            <button class="btn" onclick="buyItem('weapon')" id="buyWpnBtn">🗡️ Тактичний ніж (+5 до Сили) - 50 Золота</button>
-            <button class="btn" onclick="buyItem('armor')" id="buyArmBtn">🛡️ Бронежилет (+5 до Живучості) - 50 Золота</button>
+            <h4 style="color: var(--legendary-color);">🏰 СИНДИКАТ ТА ЗАХВАТ ТЕРИТОРІЙ</h4>
+            <div id="clanInfo" style="font-size: 10px;">Немає клану.</div>
+            <input type="text" id="clanNameInput" placeholder="Назва клану">
+            <button class="btn" onclick="createClan()" id="createClanBtn">🚩 Створити (200 💰)</button>
+            <button class="btn btn-danger" onclick="captureZone()" id="capZoneBtn" style="display:none;">⚔️ Захопити Сектор (+100 💰/год в казну)</button>
+        </div>
+        <div class="card">
+            <h4 style="color: var(--warning-color);">🎲 КАЗИНО ТА РОБОТА</h4>
+            <button class="btn btn-legend" onclick="playGamble()">🎲 Кості (25 💰)</button>
+            <button class="btn" onclick="doJob()">⛏️ Праця (+30 💰, -20 Енергії)</button>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 4: КВЕСТЫ -->
+    <!-- ВКЛАДКА 3: КРАФТ, ПИТОМЦЫ, АУКЦИОН -->
+    <div id="tab-craft" class="tab-content" style="display:none;">
+        <div class="card">
+            <h4 style="color: var(--accent-color);">🎒 РЕСУРСИ ТА ПІТОМЦІ</h4>
+            <div style="font-size: 10px; margin-bottom: 5px;">
+                <span class="badge">⚙️ Метал: <b id="resMetal">0</b></span>
+                <span class="badge">🧪 Чипи: <b id="resChips">0</b></span>
+            </div>
+            <p style="font-size: 10px;">Питомець: <b id="pPet" style="color:var(--accent-color)">Немає</b></p>
+            <button class="btn" onclick="buyPet('dog')">🐕 Купити Кібер-Пса (+10 Урону) [100 💰]</button>
+        </div>
+        <div class="card">
+            <h4 style="color: var(--warning-color);">🔨 МАЙСТЕРНЯ КРАФТУ</h4>
+            <button class="btn" onclick="craftItem('plasma')">🗡️ Плазмовий різак [+15 Сили] (10 М, 5 Ч)</button>
+            <button class="btn" onclick="craftItem('exo')">🛡️ Екзоскелет [+20 Живучості] (15 М, 10 Ч)</button>
+            <button class="btn btn-legend" onclick="craftItem('legendGun')">⚡ Гаусс-гармата [+40 Сили] (30 М, 20 Ч)</button>
+        </div>
+    </div>
+
+    <!-- ВКЛАДКА 4: КВЕСТЫ И АЛХИМИЯ -->
     <div id="tab-quests" class="tab-content" style="display:none;">
         <div class="card">
-            <h4 style="color: var(--accent-color);" id="questsTitle">ЩОДЕННІ ЗАВДАННЯ</h4>
-            <div style="margin-top: 10px; font-size: 13px;">
-                <p>🎯 <b>Перший бій:</b> Заверши 3 бої</p>
-                <p style="font-size: 11px; color: var(--text-muted);" id="q1Status">Прогрес: 0/3</p>
-                <button class="btn" onclick="claimQuest(1)" id="q1Btn">Отримати нагороду (+50 Золота)</button>
-            </div>
+            <h4 style="color: var(--accent-color);">🧪 АЛХІМІЯ ТА СТИМУЛЯТОРИ</h4>
+            <button class="btn btn-purple" onclick="craftPotion()">🧪 Зварити Стимулятор Ярості (5 Чипів)</button>
+        </div>
+        <div class="card">
+            <h4 style="color: var(--accent-color);">📜 ЗАВДАННЯ</h4>
+            <p style="font-size: 10px;">🎯 Завершити 3 бої (<span id="q1Status">0/3</span>)</p>
+            <button class="btn" onclick="claimQuest(1)">Отримати нагороду (+50 💰)</button>
         </div>
     </div>
 
     <!-- ВКЛАДКА 5: ПРОФИЛЬ -->
     <div id="tab-profile" class="tab-content" style="display:none;">
         <div class="card">
-            <h3 style="color: var(--accent-color);" id="profTitle">Характеристики</h3>
-            <p style="font-size: 12px; margin-top: 5px;">Сила: <b id="stStr">10</b></p>
-            <p style="font-size: 12px;">Спритність: <b id="stAgi">10</b></p>
-            <p style="font-size: 12px;">Живучість: <b id="stVit">10</b></p>
-            <p style="font-size: 12px; margin-top: 5px; color: var(--warning-color);">Вільні очки: <b id="stFree">0</b></p>
-            <button class="btn" style="margin-top: 10px;" onclick="addStat('str')" id="addStrBtn">+1 Сила</button>
-            <button class="btn" onclick="addStat('agi')" id="addAgiBtn">+1 Спритність</button>
-            <button class="btn" onclick="addStat('vit')" id="addVitBtn">+1 Живучість (+10 HP)</button>
+            <h3 style="color: var(--accent-color); font-size: 13px;">ПРОФІЛЬ</h3>
+            <p style="font-size: 10px;">Фракція: <b id="pFaction"></b></p>
+            <p style="font-size: 10px;">Сила: <b id="stStr">10</b></p>
+            <p style="font-size: 10px;">Спритність: <b id="stAgi">10</b></p>
+            <p style="font-size: 10px;">Живучість: <b id="stVit">10</b></p>
+            <p style="font-size: 10px; color: var(--warning-color);">Вільні очки: <b id="stFree">0</b></p>
+            <button class="btn" onclick="addStat('str')">+1 Сила</button>
+            <button class="btn" onclick="addStat('agi')">+1 Спритність</button>
+            <button class="btn" onclick="addStat('vit')">+1 Живучість</button>
         </div>
     </div>
 
-    <!-- НАВИГАЦИЯ (5 ВКЛАДОК) -->
+    <!-- НАВИГАЦИЯ (6 ВКЛАДОК) -->
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="openTab('main')" id="navMain">⚔️ Бій</button>
         <button class="tab-btn" onclick="openTab('city')" id="navCity">🏰 Місто</button>
-        <button class="tab-btn" onclick="openTab('shop')" id="navShop">🛒 Ринок</button>
+        <button class="tab-btn" onclick="openTab('craft')" id="navCraft">🔨 Крафт</button>
         <button class="tab-btn" onclick="openTab('quests')" id="navQuests">📜 Квести</button>
         <button class="tab-btn" onclick="openTab('profile')" id="navProfile">👤 Герой</button>
     </div>
@@ -281,135 +202,42 @@
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     if (tg) tg.expand();
 
-    const i18n = {
-        ua: {
-            regTitle: "Павше Місто (Fallen Town)",
-            regDesc: "Світ знищено. Введи ім'я свого вижившого:",
-            startBtn: "Почати виживання",
-            fightBtn: "⚔️ Шукати ворога (-10 Енергії)",
-            locTitle: "Руїни Селена",
-            locDesc: "Небезпечні вулиці, де чатують нападники та мутанти.",
-            logTitle: "Журнал бою",
-            cityTitle: "ЦЕНТРАЛЬНИЙ ХАБ",
-            cityDesc: "Безпечна зона Fallen Town. Тут можна відновити сили.",
-            innBtn: "🏥 Відпочити в готелі (+100 HP, +50 Енергії) - 30 Золота",
-            shopTitle: "ЧОРНИЙ РИНОК",
-            shopDesc: "Купуй спорядження для підвищення характеристик.",
-            buyWpnBtn: "🗡️ Тактичний ніж (+5 до Сили) - 50 Золота",
-            buyArmBtn: "🛡️ Бронежилет (+5 до Живучості) - 50 Золота",
-            questsTitle: "ЩОДЕННІ ЗАВДАННЯ",
-            profTitle: "Характеристики",
-            navMain: "⚔️ Бій",
-            navCity: "🏰 Місто",
-            navShop: "🛒 Ринок",
-            navQuests: "📜 Квести",
-            navProfile: "👤 Герой",
-            noEnergy: "Недостатньо енергії!",
-            noGold: "Недостатньо золота!",
-            lvlUp: "🎉 Новий рівень! Макс. Енергія збільшена на +5!"
-        },
-        en: {
-            regTitle: "Fallen Town",
-            regDesc: "The world is in ruins. Enter your survivor name:",
-            startBtn: "Start Survival",
-            fightBtn: "⚔️ Find Enemy (-10 Energy)",
-            locTitle: "Ruins of Selene",
-            locDesc: "Dangerous streets filled with raiders and mutants.",
-            logTitle: "Battle Log",
-            cityTitle: "CENTRAL HUB",
-            cityDesc: "Safe zone of Fallen Town. Rest and recover here.",
-            innBtn: "🏥 Rest at Inn (+100 HP, +50 Energy) - 30 Gold",
-            shopTitle: "BLACK MARKET",
-            shopDesc: "Buy equipment to boost attributes.",
-            buyWpnBtn: "🗡️ Tactical Knife (+5 Str) - 50 Gold",
-            buyArmBtn: "🛡️ Body Armor (+5 Vit) - 50 Gold",
-            questsTitle: "DAILY QUESTS",
-            profTitle: "Attributes",
-            navMain: "⚔️ Battle",
-            navCity: "🏰 City",
-            navShop: "🛒 Market",
-            navQuests: "📜 Quests",
-            navProfile: "👤 Hero",
-            noEnergy: "Not enough energy!",
-            noGold: "Not enough gold!",
-            lvlUp: "🎉 Level Up! Max Energy increased by +5!"
-        }
-    };
-
-    let lang = 'ua';
-
     let p = {
-        name: "",
-        lvl: 1,
-        exp: 0,
-        maxExp: 100,
-        gold: 50,
-        hp: 100,
-        maxHp: 100,
-        energy: 50,
-        maxEnergy: 50,
-        str: 10,
-        agi: 10,
-        vit: 10,
-        freeStats: 0,
-        battlesCount: 0,
-        q1Done: false,
-        lastRegen: Date.now()
+        name: "", faction: "Raiders", lvl: 1, exp: 0, maxExp: 100,
+        gold: 200, bank: 0, pvpRating: 1000,
+        hp: 100, maxHp: 100, energy: 50, maxEnergy: 50,
+        str: 10, agi: 10, vit: 10, freeStats: 0,
+        metal: 10, chips: 5, pet: null, potions: 0,
+        eqWeapon: null, eqArmor: null,
+        clan: "", clanBank: 0, bossHp: 500,
+        battlesCount: 0, q1Done: false, lastRegen: Date.now()
     };
+
+    const chatMessages = [
+        "Stalker_99: Хто йде на боса?",
+        "Ghost: Продам 10 металу за золото!",
+        "Система: Клан Raiders захопив Північний Сектор!"
+    ];
 
     function init() {
-        let saved = localStorage.getItem('fallen_town_player');
-        if (saved) {
-            p = JSON.parse(saved);
-            document.getElementById('regModal').classList.remove('active');
-        } else {
-            document.getElementById('regModal').classList.add('active');
-        }
-        updateLangUI();
-        render();
-        setInterval(regenTick, 1000);
+        let saved = localStorage.getItem('fallen_town_v5');
+        if (saved) { p = JSON.parse(saved); document.getElementById('regModal').classList.remove('active'); }
+        else { document.getElementById('regModal').classList.add('active'); }
+        render(); setInterval(regenTick, 1000); updateChat();
     }
 
-    function save() {
-        localStorage.setItem('fallen_town_player', JSON.stringify(p));
-    }
-
-    function changeLanguage(val) {
-        lang = val;
-        updateLangUI();
-    }
-
-    function updateLangUI() {
-        let t = i18n[lang];
-        document.getElementById('regTitle').innerText = t.regTitle;
-        document.getElementById('regDesc').innerText = t.regDesc;
-        document.getElementById('startBtn').innerText = t.startBtn;
-        document.getElementById('fightBtn').innerText = t.fightBtn;
-        document.getElementById('locTitle').innerText = t.locTitle;
-        document.getElementById('locDesc').innerText = t.locDesc;
-        document.getElementById('logTitle').innerText = t.logTitle;
-        document.getElementById('cityTitle').innerText = t.cityTitle;
-        document.getElementById('cityDesc').innerText = t.cityDesc;
-        document.getElementById('innBtn').innerText = t.innBtn;
-        document.getElementById('shopTitle').innerText = t.shopTitle;
-        document.getElementById('shopDesc').innerText = t.shopDesc;
-        document.getElementById('buyWpnBtn').innerText = t.buyWpnBtn;
-        document.getElementById('buyArmBtn').innerText = t.buyArmBtn;
-        document.getElementById('questsTitle').innerText = t.questsTitle;
-        document.getElementById('profTitle').innerText = t.profTitle;
-        document.getElementById('navMain').innerText = t.navMain;
-        document.getElementById('navCity').innerText = t.navCity;
-        document.getElementById('navShop').innerText = t.navShop;
-        document.getElementById('navQuests').innerText = t.navQuests;
-        document.getElementById('navProfile').innerText = t.navProfile;
-    }
+    function save() { localStorage.setItem('fallen_town_v5', JSON.stringify(p)); }
 
     function registerHero() {
-        let nameInput = document.getElementById('heroNameInput').value.trim();
-        p.name = nameInput || "Survivor";
+        let name = document.getElementById('heroNameInput').value.trim();
+        p.name = name || "Survivor";
+        let factions = document.getElementsByName('faction');
+        for (let f of factions) { if (f.checked) p.faction = f.value; }
+        if (p.faction === 'Raiders') p.str += 3;
+        if (p.faction === 'Hunters') p.agi += 3;
+        if (p.faction === 'Guardians') p.vit += 3;
         document.getElementById('regModal').classList.remove('active');
-        save();
-        render();
+        save(); render();
     }
 
     function getMaxEnergy() { return 50 + (p.lvl - 1) * 5; }
@@ -422,126 +250,147 @@
             let intervals = Math.floor(diff / 60000);
             p.energy = Math.min(p.maxEnergy, p.energy + (intervals * 10));
             p.hp = Math.min(p.maxHp, p.hp + (intervals * 5));
-            p.lastRegen = now;
-            save();
-            render();
+            p.lastRegen = now; save(); render();
         }
+    }
+
+    function updateChat() {
+        let box = document.getElementById('chatBox');
+        box.innerHTML = chatMessages.map(m => `<div>${m}</div>`).join('');
     }
 
     function render() {
         p.maxEnergy = getMaxEnergy();
-        p.maxHp = 100 + (p.vit - 10) * 10;
+        let bonusStr = (p.eqWeapon ? p.eqWeapon.bonus : 0) + (p.pet ? 10 : 0);
+        let bonusVit = p.eqArmor ? p.eqArmor.bonus : 0;
+        p.maxHp = 100 + ((p.vit + bonusVit) - 10) * 10;
 
-        document.getElementById('pName').innerText = p.name || "...";
+        document.getElementById('pName').innerText = p.name;
         document.getElementById('pLvl').innerText = p.lvl;
         document.getElementById('pGold').innerText = p.gold;
+        document.getElementById('pBank').innerText = p.bank;
+        document.getElementById('pPvp').innerText = p.pvpRating;
+        document.getElementById('pFaction').innerText = p.faction;
 
         document.getElementById('hpTxt').innerText = `${p.hp}/${p.maxHp}`;
         document.getElementById('hpFill').style.width = `${(p.hp / p.maxHp) * 100}%`;
-
         document.getElementById('energyTxt').innerText = `${p.energy}/${p.maxEnergy}`;
         document.getElementById('energyFill').style.width = `${(p.energy / p.maxEnergy) * 100}%`;
-
         document.getElementById('expTxt').innerText = `${p.exp}/${p.maxExp}`;
         document.getElementById('expFill').style.width = `${(p.exp / p.maxExp) * 100}%`;
 
-        document.getElementById('stStr').innerText = p.str;
+        document.getElementById('stStr').innerText = (p.str + bonusStr);
         document.getElementById('stAgi').innerText = p.agi;
-        document.getElementById('stVit').innerText = p.vit;
+        document.getElementById('stVit').innerText = (p.vit + bonusVit);
         document.getElementById('stFree').innerText = p.freeStats;
 
-        document.getElementById('q1Status').innerText = `Прогрес: ${Math.min(3, p.battlesCount)}/3` + (p.q1Done ? " (Виконано)" : "");
+        document.getElementById('resMetal').innerText = p.metal;
+        document.getElementById('resChips').innerText = p.chips;
+        document.getElementById('bossHp').innerText = p.bossHp;
+        document.getElementById('pPet').innerText = p.pet || "Немає";
+
+        if (p.clan) {
+            document.getElementById('clanInfo').innerHTML = `Клан: <b>${p.clan}</b> (Казна: ${p.clanBank} 💰)`;
+            document.getElementById('clanNameInput').style.display = 'none';
+            document.getElementById('createClanBtn').style.display = 'none';
+            document.getElementById('capZoneBtn').style.display = 'block';
+        }
+
+        document.getElementById('q1Status').innerText = `${Math.min(3, p.battlesCount)}/3` + (p.q1Done ? " (OK)" : "");
     }
 
     function startBattle() {
-        if (p.energy < 10) { alert(i18n[lang].noEnergy); return; }
-
-        p.energy -= 10;
-        p.battlesCount++;
-
-        let enemyDmg = 5 + p.lvl * 3;
-        let pDmg = p.str * 2 + Math.floor(Math.random() * 5);
-        let takenDmg = Math.max(2, enemyDmg - Math.floor(p.agi / 3));
-
-        p.hp = Math.max(0, p.hp - takenDmg);
-        let rewardGold = 10 + Math.floor(Math.random() * 15);
-        let rewardExp = 25 + Math.floor(Math.random() * 15);
-
-        p.gold += rewardGold;
-        p.exp += rewardExp;
-
-        document.getElementById('battleLogCard').style.display = 'block';
-        document.getElementById('battleLog').innerHTML = `⚔️ <b>${lang==='ua'?'Бій завершено':'Battle end'}!</b><br>Dmg: ${pDmg} | Taken: ${takenDmg}<br>Loot: +${rewardGold} Gold, +${rewardExp} EXP`;
-
-        checkLvlUp();
-        save();
-        render();
+        if (p.energy < 10) { alert("Мало енергії!"); return; }
+        p.energy -= 10; p.battlesCount++;
+        p.hp = Math.max(0, p.hp - 8);
+        p.gold += 18; p.exp += 35;
+        if (Math.random() > 0.4) p.metal++;
+        if (Math.random() > 0.6) p.chips++;
+        chatMessages.unshift(`${p.name}: Знайшов +18 золота в руїнах!`);
+        updateChat(); checkLvlUp(); save(); render();
     }
 
-    function healAtInn() {
-        if (p.gold < 30) { alert(i18n[lang].noGold); return; }
-        p.gold -= 30;
-        p.hp = p.maxHp;
-        p.energy = p.maxEnergy;
-        save();
-        render();
-        alert(lang === 'ua' ? "Ви повністю відновилися!" : "Fully recovered!");
-    }
-
-    function buyItem(type) {
-        if (p.gold < 50) { alert(i18n[lang].noGold); return; }
-        p.gold -= 50;
-        if (type === 'weapon') p.str += 5;
-        if (type === 'armor') p.vit += 5;
-        save();
-        render();
-        alert(lang === 'ua' ? "Предмет куплено!" : "Item purchased!");
-    }
-
-    function claimQuest(id) {
-        if (id === 1 && !p.q1Done && p.battlesCount >= 3) {
-            p.q1Done = true;
-            p.gold += 50;
-            save();
-            render();
-            alert(lang === 'ua' ? "Нагороду отримано!" : "Reward claimed!");
+    function startPvp() {
+        if (p.energy < 15) return;
+        p.energy -= 15;
+        if (Math.random() > 0.4) {
+            p.pvpRating += 20; p.gold += 60;
+            alert("🥊 Перемога на PvP арені!");
+        } else {
+            p.pvpRating = Math.max(0, p.pvpRating - 10);
+            alert("❌ Поразка в PvP.");
         }
+        save(); render();
     }
+
+    function attackBoss() {
+        if (p.energy < 25) return;
+        p.energy -= 25;
+        let dmg = (p.str + (p.pet ? 10 : 0)) * 4;
+        p.bossHp = Math.max(0, p.bossHp - dmg);
+        if (p.bossHp <= 0) {
+            p.gold += 400; p.metal += 15; p.chips += 15; p.bossHp = 500;
+            chatMessages.unshift(`🎉 ${p.name} знищив Світового Боса!`);
+            updateChat(); alert("🎉 БОС ЗНИЩЕНИЙ!");
+        } else { alert(`Босу завдано ${dmg} шкоди!`); }
+        save(); render();
+    }
+
+    function buyPet(type) {
+        if (p.gold < 100) { alert("Немає 100 золота!"); return; }
+        p.gold -= 100; p.pet = "Кібер-Пес";
+        save(); render(); alert("🐕 Кібер-Пес куплений!");
+    }
+
+    function craftPotion() {
+        if (p.chips < 5) { alert("Потрібно 5 чипів!"); return; }
+        p.chips -= 5; p.potions++;
+        alert("🧪 Стимулятор зварено!"); save(); render();
+    }
+
+    function captureZone() {
+        p.clanBank += 100;
+        alert("⚔️ Сектор захоплено! +100 золота в казну клану.");
+        save(); render();
+    }
+
+    function doJob() { if (p.energy >= 20) { p.energy -= 20; p.gold += 30; save(); render(); } }
+    function bankDeposit() { if (p.gold >= 100) { p.gold -= 100; p.bank += 100; save(); render(); } }
+    function bankWithdraw() { if (p.bank >= 100) { p.bank -= 100; p.gold += 100; save(); render(); } }
+    function playGamble() { if (p.gold >= 25) { p.gold -= 25; if (Math.random() > 0.5) p.gold += 50; save(); render(); } }
+
+    function craftItem(type) {
+        if (type === 'plasma' && p.metal >= 10 && p.chips >= 5) { p.metal -= 10; p.chips -= 5; p.eqWeapon = { bonus: 15 }; }
+        else if (type === 'exo' && p.metal >= 15 && p.chips >= 10) { p.metal -= 15; p.chips -= 10; p.eqArmor = { bonus: 20 }; }
+        else if (type === 'legendGun' && p.metal >= 30 && p.chips >= 20) { p.metal -= 30; p.chips -= 20; p.eqWeapon = { bonus: 40 }; }
+        save(); render();
+    }
+
+    function healAtInn() { if (p.gold >= 30) { p.gold -= 30; p.hp = p.maxHp; p.energy = p.maxEnergy; save(); render(); } }
+    function createClan() { let name = document.getElementById('clanNameInput').value.trim(); if (name && p.gold >= 200) { p.gold -= 200; p.clan = name; save(); render(); } }
+    function claimQuest(id) { if (id === 1 && !p.q1Done && p.battlesCount >= 3) { p.q1Done = true; p.gold += 50; save(); render(); } }
 
     function checkLvlUp() {
         if (p.exp >= p.maxExp) {
-            p.lvl += 1;
-            p.exp -= p.maxExp;
-            p.maxExp = Math.floor(p.maxExp * 1.5);
-            p.freeStats += 3;
-            p.maxEnergy = getMaxEnergy();
-            p.energy = p.maxEnergy;
-            p.hp = p.maxHp;
-            alert(i18n[lang].lvlUp);
+            p.lvl++; p.exp -= p.maxExp; p.maxExp = Math.floor(p.maxExp * 1.5);
+            p.freeStats += 3; p.maxEnergy = getMaxEnergy(); p.energy = p.maxEnergy; p.hp = p.maxHp;
+            alert("🎉 Новий рівень!");
         }
     }
 
     function addStat(type) {
-        if (p.freeStats <= 0) return;
-        p.freeStats--;
-        if (type === 'str') p.str++;
-        if (type === 'agi') p.agi++;
-        if (type === 'vit') p.vit++;
-        save();
-        render();
+        if (p.freeStats <= 0) return; p.freeStats--;
+        if (type === 'str') p.str++; if (type === 'agi') p.agi++; if (type === 'vit') p.vit++;
+        save(); render();
     }
 
     function openTab(tabName) {
-        const tabs = ['main', 'city', 'shop', 'quests', 'profile'];
-        tabs.forEach(t => {
-            document.getElementById(`tab-${t}`).style.display = t === tabName ? 'block' : 'none';
+        ['main', 'city', 'craft', 'quests', 'profile'].forEach(t => {
+            document.getElementById(`tab-${t}`).style.display = (t === tabName) ? 'block' : 'none';
         });
-
-        const navBtns = ['navMain', 'navCity', 'navShop', 'navQuests', 'navProfile'];
-        const activeMap = { main: 'navMain', city: 'navCity', shop: 'navShop', quests: 'navQuests', profile: 'navProfile' };
-        
-        navBtns.forEach(btnId => {
-            document.getElementById(btnId).classList.toggle('active', btnId === activeMap[tabName]);
+        ['navMain', 'navCity', 'navCraft', 'navQuests', 'navProfile'].forEach((b, idx) => {
+            let names = ['main', 'city', 'craft', 'quests', 'profile'];
+            document.getElementById(b).classList.toggle('active', names[idx] === tabName);
         });
     }
 
