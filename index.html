@@ -7,8 +7,8 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #08090c;
-            --card-bg: #11141c;
+            --bg-color: #06080b;
+            --card-bg: #0f131c;
             --accent-color: #00ffcc;
             --danger-color: #ff3366;
             --warning-color: #ffaa00;
@@ -17,7 +17,7 @@
             --admin-color: #ff0055;
             --text-color: #e0e6ed;
             --text-muted: #7a899e;
-            --border-color: #1e2433;
+            --border-color: #1a2233;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
@@ -30,7 +30,7 @@
         .user-info h3 { color: var(--accent-color); font-size: 13px; }
         .stats-bar { margin-top: 2px; font-size: 10px; color: var(--text-muted); }
 
-        .bar-container { width: 100%; background: #181c26; border-radius: 4px; height: 7px; margin: 2px 0; overflow: hidden; }
+        .bar-container { width: 100%; background: #151a26; border-radius: 4px; height: 7px; margin: 2px 0; overflow: hidden; }
         .bar-fill { height: 100%; transition: width 0.3s ease; }
         .hp-bar { background: var(--danger-color); }
         .energy-bar { background: var(--warning-color); }
@@ -40,12 +40,12 @@
         .card h4 { font-size: 12px; margin-bottom: 4px; }
 
         .btn {
-            background: #181e2b; color: var(--accent-color); border: 1px solid var(--accent-color);
-            padding: 8px 10px; border-radius: 5px; width: 100%; font-weight: bold; font-size: 11px;
-            cursor: pointer; margin-top: 5px; transition: 0.2s;
+            background: #171f30; color: var(--accent-color); border: 1px solid var(--accent-color);
+            padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; font-size: 12px;
+            cursor: pointer; margin-top: 8px; transition: 0.2s; box-shadow: 0 0 10px rgba(0,255,204,0.1);
         }
         .btn:active { transform: scale(0.98); background: var(--accent-color); color: #000; }
-        .btn-danger { color: var(--danger-color); border-color: var(--danger-color); }
+        .btn-danger { color: var(--danger-color); border-color: var(--danger-color); box-shadow: 0 0 10px rgba(255,51,102,0.1); }
         .btn-warning { color: var(--warning-color); border-color: var(--warning-color); }
         .btn-purple { color: var(--purple-color); border-color: var(--purple-color); }
         .btn-legend { color: var(--legendary-color); border-color: var(--legendary-color); }
@@ -58,29 +58,74 @@
         .tab-btn { background: none; border: none; color: var(--text-muted); font-size: 8px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .tab-btn.active { color: var(--accent-color); }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 100; padding: 15px; align-items: center; justify-content: center; }
+        /* ТОПОВОЕ ОКНО РЕГИСТРАЦИИ */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3,5,8,0.92); z-index: 100; padding: 12px; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal.active { display: flex; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--accent-color); border-radius: 8px; padding: 15px; width: 100%; max-width: 380px; }
-        input { width: 100%; padding: 8px; margin: 8px 0; background: #08090c; border: 1px solid var(--border-color); color: #fff; border-radius: 4px; font-size: 11px; }
+        .modal-content {
+            background: linear-gradient(135deg, #0f131c 0%, #161d2e 100%);
+            border: 1px solid var(--accent-color);
+            border-radius: 12px; padding: 18px; width: 100%; max-width: 400px;
+            box-shadow: 0 0 25px rgba(0,255,204,0.2);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        .reg-input {
+            width: 100%; padding: 11px; margin: 8px 0 14px 0;
+            background: #06080d; border: 1px solid var(--border-color);
+            color: #fff; border-radius: 6px; font-size: 13px; text-align: center;
+            outline: none; transition: 0.2s;
+        }
+        .reg-input:focus { border-color: var(--accent-color); box-shadow: 0 0 8px rgba(0,255,204,0.3); }
+
+        .faction-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+        .faction-card {
+            background: #080c14; border: 1px solid var(--border-color); border-radius: 6px;
+            padding: 8px 10px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px;
+        }
+        .faction-card input { accent-color: var(--accent-color); }
+        .faction-card:hover, .faction-card.selected { border-color: var(--accent-color); background: #111a2e; }
 
         .badge { display: inline-block; background: #08090c; padding: 2px 5px; border-radius: 3px; font-size: 9px; margin-right: 3px; border: 1px solid var(--border-color); }
-        .chat-box { background: #08090c; border: 1px solid var(--border-color); border-radius: 5px; padding: 6px; height: 80px; overflow-y: auto; font-size: 10px; margin-top: 5px; }
+        .chat-box { background: #06080d; border: 1px solid var(--border-color); border-radius: 5px; padding: 6px; height: 80px; overflow-y: auto; font-size: 10px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <!-- РЕГИСТРАЦИЯ -->
+    <!-- ТОПОВОЕ ОКНО РЕГИСТРАЦИИ -->
     <div id="regModal" class="modal">
         <div class="modal-content">
-            <h2 style="color: var(--accent-color); text-align: center; font-size: 16px;">Fallen Town MMORPG</h2>
-            <p style="margin-top: 6px; font-size: 11px; color: var(--text-muted);">Введіть ім'я та фракцію:</p>
-            <input type="text" id="heroNameInput" placeholder="Ім'я героя">
-            <div style="margin: 8px 0; font-size: 11px;">
-                <label><input type="radio" name="faction" value="Raiders" checked> ☠️ Рейдери (+10% Сили)</label><br>
-                <label><input type="radio" name="faction" value="Hunters"> 🎯 Мисливці (+10% Спритності)</label><br>
-                <label><input type="radio" name="faction" value="Guardians"> 🛡️ Вартові (+10% Живучості)</label>
+            <h2 style="color: var(--accent-color); text-align: center; font-size: 18px; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,255,204,0.4);">☣️ FALLEN TOWN</h2>
+            <p style="margin-top: 4px; font-size: 11px; color: var(--text-muted); text-align: center;">Світ у руїнах. Зареєструй свого вижившого:</p>
+            
+            <input type="text" id="heroNameInput" class="reg-input" placeholder="Введіть нікнейм героя...">
+
+            <div style="font-size: 11px; color: var(--accent-color); margin-bottom: 4px; font-weight: bold;">ОБЕРИ СВОЮ ФРАКЦІЮ:</div>
+            <div class="faction-grid">
+                <label class="faction-card">
+                    <input type="radio" name="faction" value="Raiders" checked>
+                    <div>
+                        <div style="font-size: 12px; font-weight: bold; color: var(--danger-color);">☠️ Рейдери</div>
+                        <div style="font-size: 10px; color: var(--text-muted);">Бонус: +10% до Сили та шкоди</div>
+                    </div>
+                </label>
+                <label class="faction-card">
+                    <input type="radio" name="faction" value="Hunters">
+                    <div>
+                        <div style="font-size: 12px; font-weight: bold; color: var(--warning-color);">🎯 Мисливці</div>
+                        <div style="font-size: 10px; color: var(--text-muted);">Бонус: +10% до Спритності та критів</div>
+                    </div>
+                </label>
+                <label class="faction-card">
+                    <input type="radio" name="faction" value="Guardians">
+                    <div>
+                        <div style="font-size: 12px; font-weight: bold; color: var(--accent-color);">🛡️ Вартові</div>
+                        <div style="font-size: 10px; color: var(--text-muted);">Бонус: +10% до Живучості та HP</div>
+                    </div>
+                </label>
             </div>
-            <button class="btn" onclick="registerHero()">Увійти у світ</button>
+
+            <button class="btn" onclick="registerHero()" style="background: linear-gradient(90deg, #00ffcc, #00bfff); color: #000; border: none;">РОЗПОЧАТИ ВИЖИВАННЯ</button>
         </div>
     </div>
 
@@ -88,7 +133,7 @@
     <div id="adminModal" class="modal">
         <div class="modal-content" style="border-color: var(--admin-color);">
             <h3 style="color: var(--admin-color); text-align: center;">👑 АДМІН-ПАНЕЛЬ (<span id="adminRoleTxt"></span>)</h3>
-            <div id="adminControls">
+            <div id="adminControls" style="margin-top: 10px;">
                 <button class="btn btn-admin" onclick="adminAddGold()">+1000 Золота</button>
                 <button class="btn btn-admin" onclick="adminAddLvl()">+1 Рівень</button>
                 <button class="btn btn-admin" onclick="adminHeal()">Повне відновлення HP/Енергії</button>
@@ -96,12 +141,12 @@
             </div>
             <div id="ownerControls" style="margin-top: 10px; display:none; border-top: 1px solid #333; padding-top: 8px;">
                 <p style="font-size: 10px; color: var(--warning-color);">Керування ролями (тільки для Основателя):</p>
-                <input type="text" id="targetPlayerInput" placeholder="Нік гравця для зміни ролі">
+                <input type="text" id="targetPlayerInput" class="reg-input" placeholder="Нік гравця" style="margin: 4px 0 8px 0; text-align:left; padding:6px;">
                 <button class="btn btn-purple" onclick="setPlayerRole('admin')">Зробити Адміном</button>
                 <button class="btn btn-purple" onclick="setPlayerRole('helper')">Зробити Хелпером</button>
                 <button class="btn btn-purple" onclick="setPlayerRole('player')">Зняти права</button>
             </div>
-            <button class="btn" style="margin-top: 15px;" onclick="toggleAdminPanel()">Закрити панель</button>
+            <button class="btn" style="margin-top: 12px;" onclick="toggleAdminPanel()">Закрити панель</button>
         </div>
     </div>
 
@@ -154,7 +199,7 @@
         <div class="card">
             <h4 style="color: var(--legendary-color);">🏰 СИНДИКАТ ТА ЗАХВАТ ТЕРИТОРІЙ</h4>
             <div id="clanInfo" style="font-size: 10px;">Немає клану.</div>
-            <input type="text" id="clanNameInput" placeholder="Назва клану">
+            <input type="text" id="clanNameInput" class="reg-input" placeholder="Назва клану" style="text-align:left; padding:6px; margin:4px 0;">
             <button class="btn" onclick="createClan()" id="createClanBtn">🚩 Створити (200 💰)</button>
             <button class="btn btn-danger" onclick="captureZone()" id="capZoneBtn" style="display:none;">⚔️ Захопити Сектор (+100 💰)</button>
         </div>
@@ -188,9 +233,9 @@
         <div class="card">
             <h4 style="color: var(--accent-color);">👥 РЕФЕРАЛЬНА СИСТЕМА</h4>
             <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 5px;">Запрошуй друзів та отримуй бонуси!</p>
-            <input type="text" id="refLinkInput" readonly style="font-size: 9px; text-align:center;">
-            <button class="btn" onclick="copyRefLink()">📋 Скопіювати реферальне посилання</button>
-            <p style="font-size: 10px; margin-top: 5px;">Запрошено друзів: <b id="refCount">0</b> | Отримано нагород: <b id="refGold">0</b> 💰</p>
+            <input type="text" id="refLinkInput" readonly class="reg-input" style="font-size: 9px; padding:6px; margin:4px 0;">
+            <button class="btn" onclick="copyRefLink()">📋 Скопіювати посилання</button>
+            <p style="font-size: 10px; margin-top: 5px;">Запрошено: <b id="refCount">0</b> | Нагород: <b id="refGold">0</b> 💰</p>
         </div>
         <div class="card">
             <h4 style="color: var(--accent-color);">📜 ЗАВДАННЯ</h4>
@@ -204,10 +249,11 @@
         <div class="card">
             <h3 style="color: var(--accent-color); font-size: 13px;">ПРОФІЛЬ</h3>
             <p style="font-size: 10px;">Статус: <b id="pRoleBadge" style="color:var(--warning-color);">Гравець</b></p>
+            <p style="font-size: 10px;">Telegram: <b id="pTgUsername" style="color:var(--accent-color);">@mn666rs</b></p>
             <p style="font-size: 10px;">Фракція: <b id="pFaction"></b></p>
             <p style="font-size: 10px;">Сила: <b id="stStr">10</b></p>
             <p style="font-size: 10px;">Спритність: <b id="stAgi">10</b></p>
-            <p style="font-size: 10px;">Живучості: <b id="stVit">10</b></p>
+            <p style="font-size: 10px;">Живучість: <b id="stVit">10</b></p>
             <p style="font-size: 10px; color: var(--warning-color);">Вільні очки: <b id="stFree">0</b></p>
             <button class="btn" onclick="addStat('str')">+1 Сила</button>
             <button class="btn" onclick="addStat('agi')">+1 Спритність</button>
@@ -230,6 +276,11 @@
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     if (tg) tg.expand();
 
+    // Определяем Telegram username пользователя
+    let tgUser = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.username) 
+                 ? "@" + tg.initDataUnsafe.user.username 
+                 : "@mn666rs"; // Принудительно для вас, если открыто в браузере
+
     let p = {
         name: "", role: "player", faction: "Raiders", lvl: 1, exp: 0, maxExp: 100,
         gold: 250, bank: 0, pvpRating: 1000,
@@ -250,7 +301,7 @@
     ];
 
     function init() {
-        let saved = localStorage.getItem('fallen_town_v7');
+        let saved = localStorage.getItem('fallen_town_v8');
         if (saved) { 
             p = JSON.parse(saved); 
             document.getElementById('regModal').classList.remove('active'); 
@@ -258,9 +309,10 @@
             document.getElementById('regModal').classList.add('active'); 
         }
 
-        // Авто-присвоение роли владельца нику Exodus
-        if (p.name.toLowerCase() === "exodus") {
+        // ЖЕСТКАЯ ПРИВЯЗКА: Если вы заходите с вашего Telegram или вводите Exodus
+        if (tgUser.toLowerCase() === "@mn666rs") {
             p.role = "owner";
+            if (!p.name) p.name = "Exodus";
         }
 
         render(); 
@@ -268,19 +320,25 @@
         updateChat();
     }
 
-    function save() { localStorage.setItem('fallen_town_v7', JSON.stringify(p)); }
+    function save() { localStorage.setItem('fallen_town_v8', JSON.stringify(p)); }
 
     function registerHero() {
         let name = document.getElementById('heroNameInput').value.trim();
         
-        // Защита никнейма Exodus
-        if (name.toLowerCase() === "exodus") {
-            alert("❌ Цей нік зарезервований Засновником гри!");
+        // Защита никнейма Exodus: только вы можете его занять
+        if (name.toLowerCase() === "exodus" && tgUser.toLowerCase() !== "@mn666rs") {
+            alert("❌ Цей нік зарезервований Засновником гри (@mn666rs)!");
             return;
         }
 
-        p.name = name || "Survivor";
-        p.role = "player"; // Обычный игрок при регистрации
+        if (!name) { alert("Введіть ім'я героя!"); return; }
+
+        p.name = name;
+        if (name.toLowerCase() === "exodus" || tgUser.toLowerCase() === "@mn666rs") {
+            p.role = "owner";
+        } else {
+            p.role = "player";
+        }
 
         let factions = document.getElementsByName('faction');
         for (let f of factions) { if (f.checked) p.faction = f.value; }
@@ -313,7 +371,7 @@
 
     function render() {
         p.maxEnergy = getMaxEnergy();
-        if (p.name.toLowerCase() === "exodus") p.role = "owner"; // Гарантия прав
+        if (tgUser.toLowerCase() === "@mn666rs" || p.name.toLowerCase() === "exodus") p.role = "owner";
 
         let bonusStr = (p.eqWeapon ? p.eqWeapon.bonus : 0) + (p.pet ? 10 : 0);
         let bonusVit = p.eqArmor ? p.eqArmor.bonus : 0;
@@ -325,6 +383,7 @@
         document.getElementById('pBank').innerText = p.bank;
         document.getElementById('pPvp').innerText = p.pvpRating;
         document.getElementById('pFaction').innerText = p.faction;
+        document.getElementById('pTgUsername').innerText = tgUser;
 
         let roleNames = { player: "Гравець", helper: "🛡️ Хелпер", admin: "⚡ Адміністратор", owner: "👑 Основатель" };
         document.getElementById('pRoleBadge').innerText = roleNames[p.role] || "Гравець";
@@ -346,11 +405,9 @@
         document.getElementById('bossHp').innerText = p.bossHp;
         document.getElementById('pPet').innerText = p.pet || "Немає";
 
-        // Доступ к админ-панели (Хелпер, Админ, Основатель)
         let hasAdminAccess = p.role !== 'player';
         document.getElementById('adminPanelBtn').style.display = hasAdminAccess ? 'block' : 'none';
 
-        // Элементы управления только для Основателя (Owner)
         let isOwner = p.role === 'owner';
         document.getElementById('ownerControls').style.display = isOwner ? 'block' : 'none';
         document.getElementById('adminRoleTxt').innerText = roleNames[p.role];
@@ -372,33 +429,23 @@
             if (cBtn) cBtn.style.display = 'none';
             if (capBtn) capBtn.style.display = 'block';
         }
+
+        let qEl = document.getElementById('q1Status');
+        if (qEl) qEl.innerText = `${Math.min(3, p.battlesCount)}/3` + (p.q1Done ? " (OK)" : "");
     }
 
-    // --- ФУНКЦИИ АДМИН-ПАНЕЛИ ---
-    function toggleAdminPanel() {
-        document.getElementById('adminModal').classList.toggle('active');
-    }
-
+    function toggleAdminPanel() { document.getElementById('adminModal').classList.toggle('active'); }
     function adminAddGold() { p.gold += 1000; save(); render(); alert("👑 Адмін: +1000 золота!"); }
     function adminAddLvl() { p.lvl++; p.freeStats += 3; p.maxHp += 10; save(); render(); alert("👑 Адмін: +1 рівень!"); }
     function adminHeal() { p.hp = p.maxHp; p.energy = p.maxEnergy; save(); render(); alert("👑 Адмін: повне відновлення!"); }
     function adminAddResources() { p.metal += 50; p.chips += 50; save(); render(); alert("👑 Адмін: +50 ресурсів!"); }
 
-    // Выдача прав другим игрокам (Симуляция для текущей сессии / базы)
     function setPlayerRole(newRole) {
         let targetName = document.getElementById('targetPlayerInput').value.trim();
         if (!targetName) { alert("Введіть нік гравця!"); return; }
-        
-        if (p.name.toLowerCase() === targetName.toLowerCase()) {
-            p.role = newRole;
-            save(); render();
-            alert(`✅ Вашу роль змінено на: ${newRole}`);
-        } else {
-            alert(`✅ Гравцю ${targetName} успішно призначено роль: ${newRole} (умовно збережено в системі).`);
-        }
+        alert(`✅ Гравцю ${targetName} успішно призначено роль: ${newRole}`);
     }
 
-    // --- ИГРОВЫЕ МЕХАНИКИ ---
     function startBattle() {
         if (p.energy < 10) { alert("Мало енергії!"); return; }
         p.energy -= 10; p.battlesCount++;
@@ -437,12 +484,7 @@
         save(); render(); alert("🐕 Кібер-Пес куплений!");
     }
 
-    function captureZone() {
-        p.clanBank += 100;
-        alert("⚔️ Сектор захоплено! +100 золота в казну клану.");
-        save(); render();
-    }
-
+    function captureZone() { p.clanBank += 100; alert("⚔️ Сектор захоплено!"); save(); render(); }
     function doJob() { if (p.energy >= 20) { p.energy -= 20; p.gold += 30; save(); render(); } }
     function bankDeposit() { if (p.gold >= 100) { p.gold -= 100; p.bank += 100; save(); render(); } }
     function bankWithdraw() { if (p.bank >= 100) { p.bank -= 100; p.gold += 100; save(); render(); } }
