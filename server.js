@@ -10,7 +10,7 @@ const LabEngine = require('./src/engine/LabEngine');
 const PvpEngine = require('./src/engine/PvpEngine');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/fallen_town_mmorpg';
