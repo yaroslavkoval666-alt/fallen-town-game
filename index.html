@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fallen Town: Syndicate v23</title>
+    <title>Fallen Town: Monolith v25</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -14,6 +14,7 @@
             --warning-color: #ffb700;
             --purple-color: #9d00ff;
             --legendary-color: #ff7700;
+            --admin-color: #ff0055;
             --text-color: #f1f5f9;
             --text-muted: #64748b;
             --border-color: #1e293b;
@@ -54,6 +55,7 @@
         .btn-warning { color: var(--warning-color); border-color: var(--warning-color); }
         .btn-purple { color: var(--purple-color); border-color: var(--purple-color); }
         .btn-legend { color: var(--legendary-color); border-color: var(--legendary-color); }
+        .btn-admin { color: var(--admin-color); border-color: var(--admin-color); background: #2a0815; }
 
         .nav-tabs {
             position: fixed; bottom: 0; left: 0; right: 0; background: rgba(8, 13, 26, 0.95);
@@ -84,7 +86,7 @@
         }
         .class-card input { accent-color: var(--accent-color); }
 
-        .zone-card, .mut-card {
+        .zone-card, .mut-card, .boss-card {
             background: #050a14; border: 1px solid var(--border-color); border-radius: 8px;
             padding: 10px; margin-bottom: 8px; font-size: 11px;
         }
@@ -100,8 +102,8 @@
     <!-- РЕГИСТРАЦИЯ -->
     <div id="regModal" class="modal">
         <div class="modal-content">
-            <h2 style="color: var(--accent-color); text-align: center; font-size: 18px; text-shadow: 0 0 12px rgba(0,255,204,0.4);">☣️ FALLEN TOWN: SYNDICATE</h2>
-            <p style="margin-top: 6px; font-size: 11px; color: var(--text-muted); text-align: center;">Выберите класс и создайте легенду:</p>
+            <h2 style="color: var(--accent-color); text-align: center; font-size: 18px; text-shadow: 0 0 12px rgba(0,255,204,0.4);">☣️ FALLEN TOWN: REBORN</h2>
+            <p style="margin-top: 6px; font-size: 11px; color: var(--text-muted); text-align: center;">Создайте уникального выжившего:</p>
             
             <input type="text" id="heroNameInput" class="input-box" placeholder="Позывной героя...">
 
@@ -109,19 +111,42 @@
             <div class="class-grid">
                 <label class="class-card">
                     <input type="radio" name="pClass" value="Assault" checked>
-                    <div><b style="color: var(--danger-color); font-size: 12px;">🛡️ Штурмовик</b> <div style="font-size: 9px; color:var(--text-muted)">Тяжелая броня, +50 HP</div></div>
+                    <div><b style="color: var(--danger-color); font-size: 12px;">🛡️ Штурмовик</b> <div style="font-size: 9px; color:var(--text-muted)">Тяжелая броня, пулеметы, +60 HP</div></div>
                 </label>
                 <label class="class-card">
                     <input type="radio" name="pClass" value="Sniper">
-                    <div><b style="color: var(--warning-color); font-size: 12px;">🎯 Снайпер</b> <div style="font-size: 9px; color:var(--text-muted)">Высокий урон и крит</div></div>
+                    <div><b style="color: var(--warning-color); font-size: 12px;">🎯 Снайпер</b> <div style="font-size: 9px; color:var(--text-muted)">Легкие винтовки, +15% Крита</div></div>
                 </label>
                 <label class="class-card">
                     <input type="radio" name="pClass" value="Medic">
-                    <div><b style="color: var(--accent-color); font-size: 12px;">🧪 Кибер-Медик</b> <div style="font-size: 9px; color:var(--text-muted)">Регенерация и выносливость</div></div>
+                    <div><b style="color: var(--accent-color); font-size: 12px;">🧪 Кибер-Медик</b> <div style="font-size: 9px; color:var(--text-muted)">Импланты, ускоренная регенерация</div></div>
                 </label>
             </div>
 
             <button class="btn" onclick="registerHero()" style="background: linear-gradient(135deg, #00ffcc 0%, #00bfff 100%); color: #000; border: none; padding: 12px;">ВОЙТИ В МИР</button>
+        </div>
+    </div>
+
+    <!-- АДМИН-КОНСОЛЬ -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="border-color: var(--admin-color);">
+            <h3 style="color: var(--admin-color); text-align: center; font-size: 15px;">👑 КОНСОЛЬ СОЗДАТЕЛЯ</h3>
+            <div style="font-size: 10px; margin-top: 10px;">
+                <label>Тип ресурса:</label>
+                <select id="admResType" class="input-box">
+                    <option value="gold">Золото (💰)</option>
+                    <option value="metal">Металл (⚙️)</option>
+                    <option value="chips">Чипы (🧪)</option>
+                    <option value="exp">Опыт (EXP)</option>
+                    <option value="lvl">Уровень (LVL)</option>
+                </select>
+
+                <label>Количество:</label>
+                <input type="number" id="admAmount" class="input-box" value="1000">
+
+                <button class="btn btn-admin" onclick="adminExecuteGive()">⚡ Начислить на аккаунт</button>
+            </div>
+            <button class="btn" style="margin-top: 12px;" onclick="toggleAdminPanel()">Закрыть консоль</button>
         </div>
     </div>
 
@@ -143,66 +168,80 @@
         <div class="bar-container"><div id="expFill" class="bar-fill exp-bar"></div></div>
     </div>
 
-    <!-- ВКЛАДКА 1: КАРТА И СЕКТОРЫ -->
+    <!-- ВКЛАДКА 1: КАРТА И РЕЙДЫ -->
     <div id="tab-main" class="tab-content">
         <div class="card">
-            <h4 style="color: var(--accent-color);">🗺️ КАРТА ПУСТОШЕЙ</h4>
+            <h4 style="color: var(--accent-color);">🗺️ СЕКТОРЫ ПУСТОШЕЙ</h4>
             <div class="zone-card">
-                <div class="zone-header"><b style="color:#00ffcc">Сектор 1: Окраины</b> <span style="font-size:9px; color:var(--text-muted)">Ур. 1+</span></div>
-                <div class="zone-desc">Базовые мутанты и мародеры.</div>
+                <div class="zone-header"><b style="color:#00ffcc">1. Окраины Города</b> <span style="font-size:9px; color:var(--text-muted)">Ур. 1+</span></div>
+                <div class="zone-desc">Низкая угроза. Базовый сбор ресурсов.</div>
                 <button class="btn" onclick="startZoneBattle(1)">Штурмовать [Энергия: 10]</button>
             </div>
             <div class="zone-card">
-                <div class="zone-header"><b style="color:#ffaa00">Сектор 2: Завод Х-18</b> <span style="font-size:9px; color:var(--text-muted)">Ур. 5+</span></div>
-                <div class="zone-desc">Автоматизированные дроны.</div>
+                <div class="zone-header"><b style="color:#ffaa00">2. Завод Х-18</b> <span style="font-size:9px; color:var(--text-muted)">Ур. 5+</span></div>
+                <div class="zone-desc">Автоматизированные боевые дроны.</div>
                 <button class="btn btn-warning" onclick="startZoneBattle(2)">Штурмовать [Энергия: 18]</button>
             </div>
+            <div class="zone-card">
+                <div class="zone-header"><b style="color:#ff2a5f">3. Бункер Омега</b> <span style="font-size:9px; color:var(--text-muted)">Ур. 15+</span></div>
+                <div class="zone-desc">Элитные киборги и мутанты.</div>
+                <button class="btn btn-danger" onclick="startZoneBattle(3)">Штурмовать [Энергия: 28]</button>
+            </div>
         </div>
+
         <div class="card">
-            <h4 style="color: var(--warning-color);">📜 ЛОГ БОЕВЫХ ОПЕРАЦИЙ</h4>
-            <div class="combat-log" id="combatLog">Система активна. Посетите город для улучшений.</div>
+            <h4 style="color: var(--legendary-color);">👾 РЕЙДЫ НА МИРОВЫХ БОССОВ</h4>
+            <div class="boss-card">
+                <div class="zone-header"><b style="color:#ff7700">Альфа-Мутант «Громила»</b> <span style="font-size:9px; color:var(--text-muted)">Ур. 5+</span></div>
+                <button class="btn btn-legend" onclick="attackBoss(1)">Рейд на босса [Энергия: 25]</button>
+            </div>
+            <div class="boss-card">
+                <div class="zone-header"><b style="color:#ff2a5f">Кибер-Палач «Омега»</b> <span style="font-size:9px; color:var(--text-muted)">Ур. 15+</span></div>
+                <button class="btn btn-danger" onclick="attackBoss(2)">Рейд на босса [Энергия: 40]</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4 style="color: var(--warning-color);">📜 БОЕВОЙ ТАКТИЧЕСКИЙ ЖУРНАЛ</h4>
+            <div class="combat-log" id="combatLog">Готов к боевым операциям... Выберите сектор.</div>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 2: ГОРОД (ЛАБОРАТОРИЯ И КЛАН) -->
+    <!-- ВКЛАДКА 2: ГОРОД, ЛАБОРАТОРИЯ И СИНДИКАТ -->
     <div id="tab-city" class="tab-content" style="display:none;">
         <div class="card">
-            <h4 style="color: var(--accent-color);">🏥 МЕДИЦИНСКАЯ КАПСУЛА И БАНК</h4>
-            <button class="btn btn-warning" onclick="healAtInn()">🏥 Полное лечение (-40 💰)</button>
-            <button class="btn" onclick="bankDeposit()">📥 В банк (300 💰)</button>
-            <button class="btn" onclick="bankWithdraw()">📤 Из банка (300 💰)</button>
+            <h4 style="color: var(--accent-color);">🏥 МЕДИЦИНСКИЙ СЕКТОР И БАНК</h4>
+            <button class="btn btn-warning" onclick="healAtInn()">🏥 Полное лечение у медика (-40 💰)</button>
+            <button class="btn" onclick="bankDeposit()">📥 Внести 300 золота в банк</button>
+            <button class="btn" onclick="bankWithdraw()">📤 Снять 300 золота из банка</button>
             <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px;">Банковский счет: <b id="pBank" style="color:var(--accent-color)">0</b> 💰</div>
         </div>
 
         <div class="card">
             <h4 style="color: var(--legendary-color);">🧬 КВАНТОВАЯ ЛАБОРАТОРИЯ МУТАЦИЙ</h4>
-            <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px;">Синтез генома для постоянных усилений персонажа:</p>
-            
             <div class="mut-card">
                 <div class="zone-header"><b>1. ДНК «Альфа-Хищник»</b> <span style="font-size:9px; color:var(--accent-color)">Уровень <span id="mut1Lvl">0</span></span></div>
-                <div class="zone-desc">Дает +15 к урону за каждый уровень инъекции.</div>
+                <div class="zone-desc">+15 урона за каждый уровень инъекции.</div>
                 <button class="btn btn-legend" onclick="buyMutation(1)">Синтезировать [30 Чипов, 200 💰]</button>
             </div>
             <div class="mut-card">
                 <div class="zone-header"><b>2. Нано-Броня Омега</b> <span style="font-size:9px; color:var(--accent-color)">Уровень <span id="mut2Lvl">0</span></span></div>
-                <div class="zone-desc">Дает +50 к максимальному здоровью за уровень.</div>
+                <div class="zone-desc">+50 к максимальному здоровью за уровень.</div>
                 <button class="btn btn-purple" onclick="buyMutation(2)">Синтезировать [40 Чипов, 300 💰]</button>
             </div>
         </div>
 
         <div class="card">
-            <h4 style="color: var(--warning-color);">🏰 СИНДИКАТ (МЕНЮ КЛАНА)</h4>
-            <div id="clanMenuContainer">
-                <!-- Динамически заменяется: создание или управление -->
-            </div>
+            <h4 style="color: var(--warning-color);">🏰 СИНДИКАТ (УПРАВЛЕНИЕ КЛАНОМ)</h4>
+            <div id="clanMenuContainer"></div>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 3: АРСЕНАЛ И СУМКА -->
+    <!-- ВКЛАДКА 3: ОРУЖЕЙНАЯ И СУМКА -->
     <div id="tab-arsenal" class="tab-content" style="display:none;">
         <div class="card">
-            <h4 style="color: var(--accent-color);">🛒 ОРУЖЕЙНАЯ И ИНВЕНТАРЬ</h4>
-            <div style="font-size: 10px; margin-bottom: 8px;">Ресурсы: ⚙️ Металл: <b id="resMetal">50</b> | 🧪 Чипы: <b id="resChips">50</b></div>
+            <h4 style="color: var(--accent-color);">🛒 ОРУЖЕЙНЫЙ АРСЕНАЛ И СУМКА</h4>
+            <div style="font-size: 10px; margin-bottom: 8px;">Ресурсы: ⚙️ Металл: <b id="resMetal">0</b> | 🧪 Чипы: <b id="resChips">0</b></div>
             <div id="shopList"></div>
             <div style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 8px;">
                 <div style="font-size: 11px;">Экипированное оружие: <b id="invEquip" style="color:var(--accent-color)">Отсутствует</b></div>
@@ -211,8 +250,12 @@
         </div>
     </div>
 
-    <!-- ВКЛАДКА 4: КВЕСТЫ -->
+    <!-- ВКЛАДКА 4: КВЕСТЫ И PvP -->
     <div id="tab-quests" class="tab-content" style="display:none;">
+        <div class="card">
+            <h4 style="color: var(--danger-color);">⚔️ ТАКТИЧЕСКАЯ PvP АРЕНА</h4>
+            <button class="btn btn-danger" onclick="startTacticalPvp()">🥊 Начать дуэль на арене [-20 Энергии]</button>
+        </div>
         <div class="card">
             <h4 style="color: var(--legendary-color);">📜 ЕЖЕДНЕВНЫЕ КОНТРАКТЫ</h4>
             <div class="zone-card">
@@ -223,8 +266,8 @@
         <div class="card">
             <h4 style="color: var(--accent-color);">👥 РЕФЕРАЛЬНАЯ СЕТЬ</h4>
             <input type="text" id="refLinkInput" readonly class="input-box" style="font-size:9px; text-align:center;">
-            <button class="btn" onclick="copyRefLink()">📋 Скопировать ссылку</button>
-            <p style="font-size: 10px; margin-top: 4px;">Приглашено: <b id="refCount">0</b> | Заработано: <b id="refGold">0</b> 💰</p>
+            <button class="btn" onclick="copyRefLink()">📋 Скопировать реферальную ссылку</button>
+            <p style="font-size: 10px; margin-top: 4px;">Приглашено: <b id="refCount">0</b> | Наград: <b id="refGold">0</b> 💰</p>
         </div>
     </div>
 
@@ -239,6 +282,8 @@
             <button class="btn" onclick="addStat('str')">+1 Сила</button>
             <button class="btn" onclick="addStat('agi')">+1 Ловкость</button>
             <button class="btn" onclick="addStat('vit')">+1 Живучесть (Рост HP)</button>
+            
+            <button class="btn btn-admin" id="adminPanelBtn" style="display:none; margin-top: 15px;" onclick="toggleAdminPanel()">👑 Открыть Консоль Создателя</button>
         </div>
     </div>
 
@@ -259,37 +304,50 @@
                  ? "@" + tg.initDataUnsafe.user.username : "@mn666rs";
 
     let p = {
-        name: "", pClass: "Assault", lvl: 1, exp: 0, maxExp: 100,
-        gold: 800, bank: 200, pvpRating: 1000,
+        name: "", role: "player", pClass: "Assault", lvl: 1, exp: 0, maxExp: 100,
+        gold: 1000, bank: 500, pvpRating: 1000,
         hp: 200, maxHp: 200, energy: 100, maxEnergy: 100,
         str: 10, agi: 10, vit: 10, freeStats: 0,
-        metal: 80, chips: 60,
+        metal: 100, chips: 80,
         gear: null, gearBonus: 0,
         inventory: [],
         mut1Lvl: 0, mut2Lvl: 0,
-        clan: "", clanBank: 0, clanMembers: 1,
+        clan: "Мор", clanBank: 500,
         battlesCount: 0, q1Claimed: false,
         refCount: 0, refGold: 0,
         lastRegen: Date.now()
     };
 
     const weaponsByClass = {
-        Assault: [{ name: "Тяжелый Пулемет", reqLvl: 1, bonus: 25, costMetal: 25, costChips: 15 }],
-        Sniper: [{ name: "Винтовка Фантом", reqLvl: 1, bonus: 28, costMetal: 25, costChips: 15 }],
-        Medic: [{ name: "Нейро-Клинок", reqLvl: 1, bonus: 22, costMetal: 20, costChips: 15 }]
+        Assault: [
+            { name: "Тяжелый Пулемет «Мгла»", reqLvl: 1, bonus: 25, costMetal: 25, costChips: 15 },
+            { name: "Плазмомет Штурмовика", reqLvl: 5, bonus: 65, costMetal: 50, costChips: 30 }
+        ],
+        Sniper: [
+            { name: "Винтовка «Фантом»", reqLvl: 1, bonus: 28, costMetal: 25, costChips: 15 },
+            { name: "Гаусс-Снайперка Apex", reqLvl: 5, bonus: 75, costMetal: 55, costChips: 35 }
+        ],
+        Medic: [
+            { name: "Нейро-Клинок", reqLvl: 1, bonus: 22, costMetal: 20, costChips: 15 },
+            { name: "Плазменный Излучатель", reqLvl: 5, bonus: 60, costMetal: 45, costChips: 28 }
+        ]
     };
 
     function init() {
-        let saved = localStorage.getItem('fallen_town_v23');
+        let saved = localStorage.getItem('fallen_town_v25');
         if (saved) { p = JSON.parse(saved); document.getElementById('regModal').classList.remove('active'); }
         else { document.getElementById('regModal').classList.add('active'); }
 
-        if (tgUser.toLowerCase() === "@mn666rs") { if (!p.name) p.name = "Satoru"; }
+        if (tgUser.toLowerCase() === "@mn666rs" || p.name.toLowerCase() === "satoru" || p.name.toLowerCase() === "exodus") {
+            p.role = "owner";
+            if (!p.name) p.name = "Satoru";
+        }
+
         updateMaxHp();
         render(); setInterval(regenTick, 1000);
     }
 
-    function save() { localStorage.setItem('fallen_town_v23', JSON.stringify(p)); }
+    function save() { localStorage.setItem('fallen_town_v25', JSON.stringify(p)); }
 
     function updateMaxHp() {
         let classBonus = (p.pClass === 'Assault') ? 60 : 20;
@@ -302,6 +360,10 @@
         let name = document.getElementById('heroNameInput').value.trim();
         if (!name) { alert("Введите позывной!"); return; }
         p.name = name;
+
+        if (name.toLowerCase() === "satoru" || name.toLowerCase() === "exodus" || tgUser.toLowerCase() === "@mn666rs") {
+            p.role = "owner";
+        }
 
         let classes = document.getElementsByName('pClass');
         for (let c of classes) { if (c.checked) p.pClass = c.value; }
@@ -336,6 +398,7 @@
 
     function render() {
         p.maxEnergy = getMaxEnergy();
+        if (tgUser.toLowerCase() === "@mn666rs" || p.name.toLowerCase() === "satoru") p.role = "owner";
         updateMaxHp();
 
         let classLabels = { Assault: "🛡️ Штурмовик", Sniper: "🎯 Снайпер", Medic: "🧪 Кибер-Медик" };
@@ -343,6 +406,8 @@
         document.getElementById('pLvl').innerText = p.lvl;
         document.getElementById('pClassLabel').innerText = classLabels[p.pClass];
         document.getElementById('pClassFull').innerText = classLabels[p.pClass];
+        document.getElementById('pGold').innerText = p.gold;
+        document.getElementById('pPvp').innerText = p.pvpRating;
         document.getElementById('pTgUsername').innerText = tgUser;
 
         document.getElementById('hpTxt').innerText = `${p.hp}/${p.maxHp}`;
@@ -365,24 +430,25 @@
         document.getElementById('mut1Lvl').innerText = p.mut1Lvl;
         document.getElementById('mut2Lvl').innerText = p.mut2Lvl;
 
-        // Меню клана
+        document.getElementById('adminPanelBtn').style.display = (p.role !== 'player') ? 'block' : 'none';
+
+        // Меню синдиката
         let clanContainer = document.getElementById('clanMenuContainer');
         if (!p.clan) {
             clanContainer.innerHTML = `
-                <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px;">У вас нет синдиката. Создайте свой за 300 золота:</p>
-                <input type="text" id="newClanName" class="input-box" placeholder="Название синдиката..." style="margin:4px 0;">
+                <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px;">Создайте свой синдикат:</p>
+                <input type="text" id="newClanName" class="input-box" placeholder="Название..." style="margin:4px 0;">
                 <button class="btn" onclick="createClan()">🚩 Основать синдикат [300 💰]</button>
             `;
         } else {
             clanContainer.innerHTML = `
-                <div style="font-size: 11px; margin-bottom: 6px;">Синдикат: <b style="color:var(--accent-color)">${p.clan}</b> (Участников: ${p.clanMembers})</div>
+                <div style="font-size: 11px; margin-bottom: 6px;">Синдикат: <b style="color:var(--accent-color)">${p.clan}</b></div>
                 <div style="font-size: 11px; margin-bottom: 8px;">Казна синдиката: <b style="color:var(--warning-color)">${p.clanBank}</b> 💰</div>
                 <button class="btn btn-warning" onclick="depositClanBank()">📥 Внести 100 золота в казну</button>
-                <button class="btn btn-danger" onclick="captureClanNode()" style="margin-top: 6px;">⚔️ Штурм промышленного узла (+200 💰 в казну)</button>
+                <button class="btn btn-danger" onclick="captureClanNode()" style="margin-top: 6px;">⚔️ Штурм узла (+200 💰 в казну)</button>
             `;
         }
 
-        // Квесты и рефералы
         document.getElementById('qBattlesCount').innerText = Math.min(5, p.battlesCount);
         document.getElementById('qBtn1').innerText = p.q1Claimed ? "✅ Получено" : "Забрать награду (+400 💰)";
 
@@ -391,18 +457,18 @@
         document.getElementById('refCount').innerText = p.refCount;
         document.getElementById('refGold').innerText = p.refGold;
 
-        // Магазин
+        // Оружейная
         let shopHtml = "";
         (weaponsByClass[p.pClass] || []).forEach((w, idx) => {
             shopHtml += `
                 <div class="item-card">
-                    <div><b>${w.name}</b> [Ур. ${w.reqLvl}]<br><span style="font-size:9px; color:var(--text-muted)">Урон +${w.bonus}</span></div>
+                    <div><b>${w.name}</b> [Ур. ${w.reqLvl}]<br><span style="font-size:9px; color:var(--text-muted)">Урон +${w.bonus} | ⚙️${w.costMetal}, 🧪${w.costChips}</span></div>
                     <button class="btn" style="width:auto; padding:5px 10px;" onclick="buyWeapon(${idx})">Купить</button>
                 </div>`;
         });
         document.getElementById('shopList').innerHTML = shopHtml;
 
-        // Сумка
+        // Инвентарь
         let invHtml = p.inventory.length === 0 ? "Сумка пуста." : "";
         p.inventory.forEach((item, idx) => {
             invHtml += `<div class="item-card"><div><b>${item.name}</b> (+${item.bonus})</div><button class="btn btn-warning" style="width:auto; padding:4px;" onclick="equipItem(${idx})">Надеть</button></div>`;
@@ -410,16 +476,34 @@
         document.getElementById('inventoryList').innerHTML = invHtml;
     }
 
+    function toggleAdminPanel() { document.getElementById('adminModal').classList.toggle('active'); }
+
+    function adminExecuteGive() {
+        let type = document.getElementById('admResType').value;
+        let amount = parseInt(document.getElementById('admAmount').value);
+        if (isNaN(amount)) { alert("Введите число!"); return; }
+
+        if (type === 'gold') p.gold += amount;
+        if (type === 'metal') p.metal += amount;
+        if (type === 'chips') p.chips += amount;
+        if (type === 'exp') { p.exp += amount; checkLvlUp(); }
+        if (type === 'lvl') { p.lvl += amount; p.freeStats += amount * 4; }
+
+        save(); render();
+        alert(`👑 Выдано ${amount} (${type})!`);
+        toggleAdminPanel();
+    }
+
     function buyMutation(type) {
         if (type === 1) {
             if (p.chips < 30 || p.gold < 200) { alert("Требуется 30 чипов и 200 золота!"); return; }
             p.chips -= 30; p.gold -= 200; p.mut1Lvl++;
-            alert("🧬 Мутация «Альфа-Хищник» успешно усилена!");
+            alert("🧬 Мутация «Альфа-Хищник» усилена!");
         } else if (type === 2) {
             if (p.chips < 40 || p.gold < 300) { alert("Требуется 40 чипов и 300 золота!"); return; }
             p.chips -= 40; p.gold -= 300; p.mut2Lvl++;
             updateMaxHp(); p.hp = p.maxHp;
-            alert("🧬 Нано-Броня Омега успешно улучшена!");
+            alert("🧬 Нано-Броня Омега улучшена!");
         }
         save(); render();
     }
@@ -427,22 +511,21 @@
     function createClan() {
         let name = document.getElementById('newClanName').value.trim();
         if (!name) { alert("Введите название!"); return; }
-        if (p.gold < 300) { alert("Нужно 300 золота для создания синдиката!"); return; }
+        if (p.gold < 300) { alert("Нужно 300 золота!"); return; }
         p.gold -= 300; p.clan = name; p.clanBank = 100;
-        save(); render(); alert(`🎉 Синдикат "${name}" успешно создан!`);
+        save(); render(); alert(`🎉 Синдикат "${name}" создан!`);
     }
 
     function depositClanBank() {
-        if (p.gold < 100) { alert("Недостаточно личного золота!"); return; }
+        if (p.gold < 100) { alert("Недостаточно золота!"); return; }
         p.gold -= 100; p.clanBank += 100;
-        save(); render(); alert("💰 Казна синдиката пополнена!");
+        save(); render(); alert("💰 Казна пополнена!");
     }
 
     function captureClanNode() {
-        if (p.energy < 20) { alert("Мало энергии для штурма узла!"); return; }
-        p.energy -= 20;
-        p.clanBank += 200; p.gold += 50;
-        save(); render(); alert("⚔️ Узел успешно захвачен! +200 в казну синдиката, +50 лично.");
+        if (p.energy < 20) { alert("Мало энергии!"); return; }
+        p.energy -= 20; p.clanBank += 200; p.gold += 50;
+        save(); render(); alert("⚔️ Узел захвачен! +200 в казну синдиката.");
     }
 
     function buyWeapon(idx) {
@@ -460,26 +543,68 @@
     }
 
     function startZoneBattle(zoneId) {
-        let reqLvl = [1, 5];
-        let cost = [10, 18][zoneId - 1];
+        let reqLvl = [1, 5, 15];
+        let cost = [10, 18, 28][zoneId - 1];
         if (p.lvl < reqLvl[zoneId - 1]) { alert("Сектор слишком опасен!"); return; }
         if (p.energy < cost) { alert("Мало энергии!"); return; }
 
         p.energy -= cost; p.battlesCount++;
-        let success = Math.random() < (0.6 + p.lvl * 0.02);
+        let success = Math.random() < (0.65 + p.lvl * 0.02);
 
         if (success) {
             let gold = zoneId * 50; let exp = zoneId * 70;
             p.gold += gold; p.exp += exp; p.metal += zoneId * 2; p.chips += zoneId;
-            logCombat(`[Сектор ${zoneId}] Победа! +${gold} 💰, +${exp} EXP.`);
+            logCombat(`[Сектор ${zoneId}] Победа! +${gold} 💰, +${exp} EXP, +${zoneId * 2} ⚙️ Металла.`);
             alert(`✅ Победа! +${gold} золота.`);
         } else {
             let dmg = zoneId * 15;
             p.hp = Math.max(0, p.hp - dmg);
-            logCombat(`[Сектор ${zoneId}] Поражение. Урон: -${dmg} HP.`);
+            logCombat(`[Сектор ${zoneId}] Поражение. Получено урона: -${dmg} HP.`);
             alert(`❌ Поражение! Потеряно ${dmg} HP.`);
         }
         checkLvlUp(); save(); render();
+    }
+
+    function attackBoss(bossId) {
+        let bossData = bossId === 1 
+            ? { name: "Альфа-Мутант «Громила»", reqLvl: 5, hp: 150, dmg: 35, cost: 25, reward: 350, exp: 250 }
+            : { name: "Кибер-Палач «Омега»", reqLvl: 15, hp: 300, dmg: 70, cost: 40, reward: 800, exp: 600 };
+
+        if (p.lvl < bossData.reqLvl) { alert(`Требуется ${bossData.reqLvl} уровень!`); return; }
+        if (p.energy < bossData.cost) { alert("Мало энергии для рейда!"); return; }
+
+        p.energy -= bossData.cost;
+        let myPower = (p.str + p.gearBonus + (p.mut1Lvl * 15)) * 4;
+
+        if (myPower >= bossData.hp) {
+            p.gold += bossData.reward; p.exp += bossData.exp;
+            logCombat(`🎉 БОСС ПОБЕЖДЕН! Получено: +${bossData.reward} 💰, +${bossData.exp} EXP.`);
+            alert(`🎉 БОСС УНИЧТОЖЕН! Награда: +${bossData.reward} золота.`);
+        } else {
+            p.hp = Math.max(0, p.hp - bossData.dmg);
+            logCombat(`[Рейд] Босс дал отпор! Получено урона: -${bossData.dmg} HP.`);
+            alert(`❌ Босс оказался сильнее! Потеряно ${bossData.dmg} HP.`);
+        }
+        checkLvlUp(); save(); render();
+    }
+
+    function startTacticalPvp() {
+        if (p.energy < 20) { alert("Мало энергии!"); return; }
+        p.energy -= 20;
+
+        let myPower = (p.str + p.gearBonus + (p.mut1Lvl * 15)) * 2 + p.agi * 1.5;
+        let enemyPower = 40 + p.lvl * 12;
+
+        if (myPower >= enemyPower) {
+            p.pvpRating += 45; p.gold += 160;
+            logCombat(`[PvP] Тактическая победа! Рейтинг +45, золото +160.`);
+            alert("🥊 Победа на арене!");
+        } else {
+            p.pvpRating = Math.max(0, p.pvpRating - 15);
+            logCombat(`[PvP] Противник переиграл вас. Рейтинг -15.`);
+            alert("❌ Поражение на арене.");
+        }
+        save(); render();
     }
 
     function healAtInn() {
@@ -511,7 +636,7 @@
             p.lvl++; p.exp -= p.maxExp; p.maxExp = Math.floor(p.maxExp * 1.6);
             p.freeStats += 4; p.maxEnergy = getMaxEnergy(); p.energy = p.maxEnergy;
             updateMaxHp(); p.hp = p.maxHp;
-            alert("🎉 Поздравляем! Получен новый уровень!");
+            alert("🎉 Поздравляем! Получен новый уровень, здоровье восстановлено!");
         }
     }
 
